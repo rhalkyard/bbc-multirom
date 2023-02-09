@@ -1,0 +1,67 @@
+Name        MultiROM ;
+PartNo      16V8 ;
+Date        2023-02-09 ;
+Revision    01 ;
+Designer    Richard Halkyard ;
+Company     None ;
+Assembly    MultiROM Cartridge for BBC Master and Acorn Electron ;
+Location    U2 ;
+Device      g16v8 ;
+
+
+ORDER: !A15L, !A16L, !A15H, !A16H, ROMQA, !MADET, Phi2, !ROMOE, CSRnW, MRnW, A15, A16, !CS, !OE, !PGM; 
+
+
+VECTORS:
+/* Address line test cases*/
+/* Select low ROM */
+11000XXXXXLLXXX
+10010XXXXXLHXXX
+01100XXXXXHLXXX
+00110XXXXXHHXXX
+/* Select high ROM */
+00111XXXXXLLXXX
+01101XXXXXLHXXX
+10011XXXXXHLXXX
+11001XXXXXHHXXX
+
+/* BBC Master test cases */
+/* Chip select must be inactive while clock is low */
+XXXXX00000XXH**
+XXXXX00001XXH**
+XXXXX00010XXH**
+XXXXX00011XXH**
+XXXXX00100XXH**
+XXXXX00101XXH**
+XXXXX00110XXH**
+XXXXX00111XXH**
+/* Todo */
+XXXXX01000XX***
+XXXXX01001XX***
+XXXXX01010XX***
+XXXXX01011XX***
+XXXXX01100XX***
+XXXXX01101XX***
+XXXXX01110XX***
+XXXXX01111XX***
+
+/* Acorn Electron test cases */
+/* Chip select must be inactive while clock is low */
+XXXXX10000XXH**
+XXXXX10001XXH**
+XXXXX10010XXH**
+XXXXX10011XXH**
+XXXXX10100XXH**
+XXXXX10101XXH**
+XXXXX10110XXH**
+XXXXX10111XXH**
+/* Todo */
+XXXXX11000XX***
+XXXXX11001XX***
+XXXXX11010XX***
+XXXXX11011XX***
+XXXXX11100XX***
+XXXXX11101XX***
+XXXXX11100XX***
+XXXXX11111XX***
+XXXXX11110XX***
