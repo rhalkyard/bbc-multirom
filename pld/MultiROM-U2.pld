@@ -1,0 +1,48 @@
+Name        MultiROM-U2 ;
+PartNo      MRU2 ;
+Date        2023-02-09 ;
+Revision    01 ;
+Designer    Richard Halkyard ;
+Company     None ;
+Assembly    MultiROM Cartridge for BBC Master and Acorn Electron ;
+Location    U2 ;
+Device      g16v8 ;
+
+
+/* *************** INPUT PINS *******************************************/
+PIN 1   = Phi2 ;        /* Processor clock */
+PIN 2   = M_RW ;        /* BBC Master Read/!Write. Unused on Electron */
+PIN 3   = M_CS_E_RW ;   /* Master: active-high select. Electron: Read/!Write */
+PIN 4   = !ROMOE ;      /* Cartridge select line */
+PIN 5   = ROMQA ;       /* ROM low/high select */
+PIN 6   = !A16H ;       /* Bank-select switch input for high ROM */
+PIN 7   = !A15H ;       /* Bank-select switch input for high ROM */
+PIN 8   = !A16L ;       /* Bank-select switch input for low ROM */
+PIN 9   = !A15L ;       /* Bank-select switch input for low ROM */
+/* PIN 10 = GND */
+PIN 11  = !MADET ;      /* Master/Electron sense. Low = Master */
+
+
+/* *************** OUTPUT PINS ******************************************/
+PIN 12  = !CS ;         /* Flash chip select */
+PIN 13  = !OE ;         /* Flash output enable */
+/* PIN 14 unused */
+/* PIN 15 unused */
+/* PIN 16 unused */
+PIN 17  = !PGM ;        /* Flash program enable */
+PIN 18  = A15 ;         /* Flash address line A15 */
+PIN 19  = A16 ;         /* Flash address line A16 */
+/* PIN 20 = VCC */
+
+
+/* *************** LOGIC EQUATIONS  *************************************/
+/* Address line switches
+          Low ROM                     High ROM                          */
+A15     = !ROMQA & A15L             # ROMQA & A15H ;
+A16     = !ROMQA & A16L             # ROMQA & A16H ;
+
+/* Selection logic
+          Master                        Electron                          */
+CS      = MADET & M_CS_E_RW & Phi2      # !MADET & ROMOE & Phi2 ;
+OE      = MADET & ROMOE & M_RW          # !MADET & ROMOE & M_CS_E_RW ;
+PGM     = MADET & !M_RW                 # !MADET & !M_CS_E_RW ;

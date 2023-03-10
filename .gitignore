@@ -32,7 +32,13 @@ fp-info-cache
 *.xml
 *.csv
 
-# GAL build output
+# Gerbers
+*.gbr
+*.gbrjob
+*.drl
+
+# CUPL build output
+*.jed
 *.chp
 *.fus
 *.pin
