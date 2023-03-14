@@ -37,7 +37,7 @@ fp-info-cache
 *.gbrjob
 *.drl
 
-# CUPL build output
+# CUPL/GALasm build output
 *.jed
 *.chp
 *.fus

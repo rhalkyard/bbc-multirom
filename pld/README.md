@@ -1,11 +1,25 @@
 # PLD files for MultiROM
 
-This directory contains the WinCUPL project for the 16V8 GAL used to provide selection and addressing logic.
+This directory contains CUPL and GALasm source for the 16V8 GAL used to provide selection and addressing logic.
 
 ## Building
 
-WinCUPL is available free from Microchip at https://www.microchip.com/en-us/products/fpgas-and-plds/spld-cplds/pld-design-resources. However, the graphical frontend is broken on modern version of Windows (I run it in an XP VM and even then it's only barely usable).
+### Building with WinCUPL
 
-The included [build.bat](build.bat) script invokes the CUPL compiler from the command line to build and test the logic without having to mess around with the WinCUPL GUI. It assumes that WinCUPL is installed to the default `C:\WINCUPL` directory, if you have installed it somewhere else, you'll need to change `WINCUPL_DIR` on the first line of the script.
+CUPL source suitable for WinCUPL can be found in the `cupl/` subdirectory
 
-WinCUPL is Windows-only, sorry.
+WinCUPL can be [downloaded](https://www.microchip.com/en-us/products/fpgas-and-plds/spld-cplds/pld-design-resources) free from Atmel, but is available only for Windows, and the GUI does not work on anything newer than Windows XP.
+
+[cupl/build.bat](cupl/build.bat) builds the source using WinCUPL's command-line compiler, which does still work on modern systems.
+
+### Building with GALasm
+
+GALasm source and a `Makefile` to build it can be found in the `GALasm/` directory.
+
+[GALasm](https://github.com/daveho/GALasm) is a free cross-platform tool for compiling GAL logic. It's just as old and crusty as WinCUPL, but it will at least run on OSes other than Windows. However, its license strictly forbids any commercial use.
+
+## Programming
+
+CUPL and GALasm both produce numerous output files, but the one that matters is the JEDEC fuse map with a `.jed` extension.
+
+The cheap and ubiquitous [XGecu](http://www.autoelectric.cn/en/TL866_main.html) (aka TL866) USB programmers are capable of programming this file onto the chip.

@@ -20,7 +20,7 @@ PIN 7   = !A15H ;       /* Bank-select switch input for high ROM */
 PIN 8   = !A16L ;       /* Bank-select switch input for low ROM */
 PIN 9   = !A15L ;       /* Bank-select switch input for low ROM */
 /* PIN 10 = GND */
-PIN 11  = !MADET ;      /* Master/Electron sense. Low = Master */
+PIN 11  = !MADET ;      /* Master/Electron sense */
 
 
 /* *************** OUTPUT PINS ******************************************/
@@ -41,8 +41,10 @@ PIN 19  = A16 ;         /* Flash address line A16 */
 A15     = !ROMQA & A15L             # ROMQA & A15H ;
 A16     = !ROMQA & A16L             # ROMQA & A16H ;
 
-/* Selection logic
-          Master                        Electron                          */
-CS      = MADET & M_CS_E_RW & Phi2      # !MADET & ROMOE & Phi2 ;
-OE      = MADET & ROMOE & M_RW          # !MADET & ROMOE & M_CS_E_RW ;
-PGM     = MADET & !M_RW                 # !MADET & !M_CS_E_RW ;
+/* Selection logic                                                      */
+$DEFINE SEL (ROMOE & Phi2)
+CS      =   SEL;
+
+/*          Master                          Electron                    */
+OE      =   MADET & SEL & M_RW              # !MADET & SEL & M_CS_E_RW ;
+PGM     =   MADET & !M_RW                   # !MADET & !M_CS_E_RW ;
