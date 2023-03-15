@@ -30,7 +30,7 @@ strbuf = &0600  \ BASIC won't mind if we borrow its string buffer
 \ Variables
 romsav = &70    \ Previous ROM number to restore
 romptr = &72    \ Pointer into ROM
-bufptr = &74    \ Pointer into RAM bufferS
+bufptr = &74    \ Pointer into RAM buffer
 
 ORG &1D00
 .begin
@@ -40,9 +40,14 @@ ORG &1D00
     CPY #&60:BCS ram_ok     \ Check high byte to make sure screen memory starts at >=&6000
     BRK
     EQUS 0, "No room. Use MODE 6.", 0
+.ram_ok
+    LDA #&EA:LDX #0:LDY #$FF:JSR osbyte
+    TXA:BEQ tube_ok
+    BRK
+    EQUS 0, "Can't run on Tube.", 0
 .exit
     RTS     \ Just a convenient place to put this, we branch to it in checks below
-.ram_ok
+.tube_ok
 
     LDA #&00:LDX #&01:JSR osbyte    \ OSBYTE &00,&01: return host type in X
     CPX #0:BNE not_elk              \ Are we running on an Electron?
