@@ -8,6 +8,8 @@ This directory contains BeebASM code and tools for programming and erasing the M
 
 [`miniprog.6502`](miniprog.6502) - a bare-bones programmer utility using the routines from `flashio.6502`.
 
+[`listroms.bbc`](listroms.bbc) - a BASIC program to list all Sideways ROMs, identifying their contents and whether they are ROM, Sideways RAM, or Flash (similar to the `*ROMS` command on the B+ and Master).
+
 ## Miniprog
 
 Miniprog is an absolute bare-bones utility designed to cover 'extreme' use cases where more fancy tools might not work. It loads the entirety of the ROM image into a RAM buffer in one go, rather than piecewise. This allows ROM images to be loaded from tape without motor control, which helps, for example, when loading from audio files on a digital recorder. Additionally, despite having a 16K buffer, it only uses memory from `&1D00`-`&5FFF`, allowing it to fit on an Electron with ADFS.

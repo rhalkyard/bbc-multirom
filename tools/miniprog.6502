@@ -253,3 +253,4 @@ ENDIF
 .end
 
 SAVE begin, end, begin
+PUTBASIC "listroms.bbc", "rlist"
