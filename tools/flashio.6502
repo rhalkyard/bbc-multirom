@@ -1,0 +1,233 @@
+\ Common routines for programming and erasing the SST39SF010 flash IC in a
+\ MultiROM cartridge. Should work with any SST39SF010 hardware that maps to an
+\ adjacent set of sideways ROMs with the low bit of ROMSEL attached to A14.
+
+\ ZP locations:
+\ romsav (1 byte)   - saved ROM number
+\ romptr (2 bytes)  - pointer into ROM
+
+\ Read ROM ID bytes into A and Y
+\ Arguments:    X - ROM to select
+\ Returns:      A - manufacturer ID
+\               Y - product ID
+\
+\ Uses the (I think) invalid manufacturer ID &00 to indicate an error:
+\       Product ID &00 - ROM did not respond to query command
+\       Product ID &01 - 'ROM' is actually Sideways RAM
+.read_id
+{
+    JSR prologue
+    TXA
+    JSR select_rom
+
+    \ Check for sideways RAM before we try writing!
+    LDA &8000
+    EOR #&FF
+    STA &8000
+    CMP &8000
+    BEQ ram
+
+    LDA #&90:JSR command    \ Enter ID mode
+    LDA &8000               \ Read manufacturer ID byte
+    LDY &8001               \ Read product ID byte
+    PHA
+    LDA #&F0:JSR command    \ Exit ID mode
+    PLA
+
+\ Check if the first two bytes of the ROM match the ID bytes we just read
+    CMP &8000
+    BNE got_id
+    CPY &8001
+    BNE got_id
+\... if so, we're almost certainly not looking at a valid flash IC. Return an
+\ invalid ID of 00,00
+    LDA #$00
+    LDX #$00
+
+.got_id
+    JMP epilogue
+
+.ram
+\ Oops, it was actually RAM! Restore the byte we clobbered and return an
+\ invalid ID of 00,01
+    EOR #&FF
+    STA &8000
+    LDA #$00
+    LDY #$01
+    JMP epilogue
+}
+
+\ Erase a single 4K sector, pointed to by romptr
+\ Arguments:    X - ROM to select
+\               romptr (zero page) - address of sector to erase
+\ Destroys:     A, Y
+.erase_sector
+{
+    JSR prologue
+    TXA
+    JSR select_rom
+    LDA #&80:JSR command
+    JSR magic
+    TXA
+    JSR select_rom
+    LDA #&30
+    LDY #0
+    STA (romptr), Y
+    LDA #&FF
+    JSR wait_complete
+    JMP epilogue
+}
+
+\ Erase an entire ROM
+\ Arguments:    X - ROM to select
+\ Destroys:     A, Y, romptr
+.erase_rom
+{
+    LDA #&00
+    STA romptr
+    LDA #&80
+    STA romptr+1
+
+    JSR erase_sector
+    CLC:LDA romptr-1:ADC #&10:STA romptr+1
+    JSR erase_sector
+    CLC:LDA romptr-1:ADC #&10:STA romptr+1
+    JSR erase_sector
+    CLC:LDA romptr-1:ADC #&10:STA romptr+1
+    JMP erase_sector
+}
+
+\ Write a byte to (romptr),y
+\ Arguments:    A - byte to write
+\               X - ROM to select
+\               (romptr), Y - address to write
+\ Preserves:    A, X, Y
+.write_byte
+{
+    PHA
+    JSR prologue
+    TXA
+    JSR select_rom
+    LDA #&A0
+    JSR command
+    TXA
+    JSR select_rom
+    PLA
+    STA (romptr),Y
+    JSR wait_complete   \ Destroys A but reads it back from (romptr),Y
+    JMP epilogue
+}
+
+\ Read a byte from (romptr),y
+\ Arguments:    X - ROM to select
+\               (romptr), Y - address to write
+\ Returns:      A - byte from ROM
+\ Preserves:    X, Y
+.read_byte
+{
+    PHA
+    JSR prologue
+    TXA
+    JSR select_rom
+    PLA
+    LDA (romptr),Y
+    JMP epilogue
+}
+
+\*******************************************************************************
+\ Private routines used within this source file. Code that 
+
+\ Disable interrupts and save current ROM
+\ Preserves:    A, X, Y
+.prologue
+{
+    PHA
+    SEI
+    LDA romzp
+    STA romsav
+    PLA
+    RTS
+}
+
+\ Re-enable interrupts and page original ROM back in
+\ Preserves:    A, X, Y
+.epilogue
+{
+    PHA
+    LDA romsav
+    JSR select_rom
+    CLI
+    PLA
+    RTS
+}
+
+\ Page in a ROM
+\ Arguments:    A - rom number to page in
+\ Preserves:    A, X, Y
+.select_rom
+{
+    STA romzp
+.*romsel_sta    \ export this label so that we can patch the address of ROMSEL on Electron
+    STA romsel
+    RTS
+}
+
+\ Select low ROM
+\ Preserves:    X, Y
+\ Destroys:     A
+.low_rom
+{
+    LDA romzp
+    AND #&FE
+    JSR select_rom
+    RTS
+}
+
+\ Select high ROM
+\ Preserves:    X, Y
+\ Destroys:     A
+.high_rom
+{
+    LDA romzp
+    ORA #&01
+    JSR select_rom
+    RTS
+}
+
+\ Send 'magic write' sequence to the currently paged-in ROM
+\ Preserves:    X, Y
+\ Destroys:     A
+.magic
+{
+    JSR high_rom
+    LDA #&AA:STA &9555      \ Write &AA to &5555
+    JSR low_rom
+    LDA #&55:STA &AAAA      \ Write &55 to &2AAA
+    RTS
+}
+
+\ Send a command to the currently paged-in ROM
+\ Arguments:    A - command byte to send
+\ Preserves:    A, X, Y
+.command
+{
+    PHA
+    JSR magic   \ Write &AA to &5555, &55 to &2AAA
+    JSR high_rom
+    PLA
+    STA &9555   \ Write command byte to &5555
+    RTS
+}
+
+\ SST39SF010 indicates an operation in progress by toggling bit 6 on every
+\ subsequent read. Repeatedly read (romptr),Y until we get the same value twice.
+\ Preserves:    X, Y
+\ Returns:      A - byte at (romptr),Y
+.wait_complete
+{
+.loop
+    LDA (romptr), Y
+    CMP (romptr), Y
+    BNE loop
+    RTS
+}
