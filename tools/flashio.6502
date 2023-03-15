@@ -97,6 +97,19 @@
     JMP erase_sector
 }
 
+\ Erase the whole chip
+\ Arguments:    X - ROM to select
+\ Destroys:     A, X
+.erase_chip
+{
+    JSR prologue
+    TXA
+    JSR select_rom
+    LDA #&80:JSR command
+    LDA #&10:JSR command
+    JMP epilogue
+}
+
 \ Write a byte to (romptr),y
 \ Arguments:    A - byte to write
 \               X - ROM to select
@@ -135,7 +148,7 @@
 }
 
 \*******************************************************************************
-\ Private routines used within this source file. Code that 
+\ Private routines used within this source file, probably not very useful elsewhere.
 
 \ Disable interrupts and save current ROM
 \ Preserves:    A, X, Y
