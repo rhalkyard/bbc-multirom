@@ -1,163 +1,174 @@
-REM Simple program to list installed ROMs, similar to *ROMS on later MOS versions
-DIM buf% 256
-DIM code% 256
-PROCassemble
-result=USR(tubecheck)
-FOR rom% = 15 TO 0 STEP -1
-A%=rom%
-result=USR(read_id) AND &FFFF
-type$="?"
-IF result=&BFB5 THEN type$="Flash":REM Flash
-IF result=&0001 THEN type$="SWRAM":REM Writeable
-result=USR(read_header)
-IF ((result AND &FF)=0) AND (type$="?") THEN type$="ROM"
-PRINT type$;TAB(6);~rom%;TAB(8);
-IF type$<>"?" THEN PROCtitle
-PRINT
-NEXT rom%
-END
+    REM Simple program to list installed ROMs, similar to *ROMS on later MOS versions
+    DIM buf% 256
+    DIM code% 256
+    PROCassemble
 
-DEFPROCtitle
-offset=9
-REPEAT
-ch=buf%?offset
-PRINT CHR$(ch);
-offset=offset+1
-UNTIL ch=0
-ENDPROC
+    result=USR(tubecheck)
+    FOR rom% = 15 TO 0 STEP -1
+        REM determine type
+        A%=rom%:result=USR(read_id) AND &FFFF
+        type$="?"
+        IF result=&BFB5 THEN type$="Flash":REM Flash
+        IF result=&0001 THEN type$="SWRAM":REM Writeable
 
-DEFPROCassemble
-osbyte = &FFF4
-romzp = &F4
-romsel = &FE30
-romsav = &70
-IF INKEY(-256) = &01 THEN romsel = &FE05
-FOR pass% = 0 TO 2 STEP 2
-P% = code%
-[OPT pass%
-.tubecheck
-    LDA #&EA:LDX #0:LDY #&FF:JSR osbyte
-    TXA:BEQ tube_ok
-    BRK
-]
-?P%=0
-$(P%+1)="Can't run on Tube"
-P%?18=0
-P%=P%+19
-[OPT pass%
-.tube_ok
-    RTS
+        REM read ROM header and check for validity
+        result=USR(read_header)
+        IF ((result AND &FF)=0) AND (type$="?") THEN type$="ROM"
+        PRINT type$;TAB(6);~rom%;TAB(8);
+        IF type$<>"?" THEN PROCtitle
+        PRINT
+    NEXT rom%
+    END
 
-.prologue
-    PHA
-    SEI
-    LDA romzp
-    STA romsav
-    PLA
-    RTS
+    DEFPROCtitle
+    REM Print ROM title and version string from header
+    FOR I% = buf%+9 TO buf%+?(buf%+7)-1
+        ch%=?I%
+        REM Skip nonprinting chars
+        IF ch% < &20 THEN PRINT " ";
+        IF (ch% >= &20) AND (ch% <= &7E) THEN PRINT CHR$(ch%);
+    NEXT
+    ENDPROC
 
-.epilogue
-    PHA
-    LDA romsav
-    JSR select_rom
-    CLI
-    PLA
-    RTS
+    DEFPROCassemble
+    osbyte = &FFF4
+    romzp = &F4
+    romsel = &FE30
+    romsav = &70
+    IF INKEY(-256) = &01 THEN romsel = &FE05
+    FOR pass% = 0 TO 2 STEP 2
+    P% = code%
+    [OPT pass%
+    .tubecheck
+        LDA #&EA:LDX #0:LDY #&FF:JSR osbyte
+        TXA:BEQ tube_ok
+        BRK
+    ]
+    ?P%=0
+    $(P%+1)="Can't run on Tube"
+    P%?18=0
+    P%=P%+19
+    [OPT pass%
+    .tube_ok
+        RTS
 
-.select_rom
-    STA romzp
-    STA romsel
-    RTS
+    .prologue
+        PHA
+        SEI
+        LDA romzp
+        STA romsav
+        PLA
+        RTS
 
-.low_rom
-    LDA romzp
-    AND #&FE
-    JSR select_rom
-    RTS
+    .epilogue
+        PHA
+        LDA romsav
+        JSR select_rom
+        CLI
+        PLA
+        RTS
 
-.high_rom
-    LDA romzp
-    ORA #&01
-    JSR select_rom
-    RTS
+    .select_rom
+        STA romzp
+        STA romsel
+        RTS
 
-.command
-    PHA
-    JSR high_rom
-    LDA #&AA:STA &9555      \ Write &AA to &5555
-    JSR low_rom
-    LDA #&55:STA &AAAA      \ Write &55 to &2AAA
-    JSR high_rom
-    PLA
-    STA &9555   \ Write command byte to &5555
-    RTS
+    .low_rom
+        LDA romzp
+        AND #&FE
+        JSR select_rom
+        RTS
 
-.read_id
-    JSR prologue
-    JSR select_rom
+    .high_rom
+        LDA romzp
+        ORA #&01
+        JSR select_rom
+        RTS
 
-    \ Check for sideways RAM before we try writing!
-    LDA &8000
-    EOR #&FF
-    STA &8000
-    CMP &8000
-    BEQ ram
+    .command
+        PHA
+        JSR high_rom
+        LDA #&AA:STA &9555
+        JSR low_rom
+        LDA #&55:STA &AAAA
+        JSR high_rom
+        PLA
+        STA &9555
+        RTS
 
-    LDA #&90:JSR command    \ Enter ID mode
-    LDX &8000               \ Read manufacturer ID byte
-    LDA &8001               \ Read product ID byte
-    PHA
-    LDA #&F0:JSR command    \ Exit ID mode
-    PLA
+    \ Identify memory type
+    \ Call with A=ROM number
+    \ Returns with JEDEC ID bytes (X=mfg, A=device) if readable
+    \ X=&00, A=&01 for RAM
+    \ X=&00, A=&00 otherwise (ROM or empty)
+    .read_id
+        JSR prologue
+        JSR select_rom
 
-\ Check if the first two bytes of the ROM match the ID bytes we just read
-    CPX &8000
-    BNE got_id
-    CMP &8001
-    BNE got_id
-\... if so, we're almost certainly not looking at a valid flash IC. Return an
-\ invalid ID of 00,00
-    LDX #&00
-    LDA #&00
+        \ Check for sideways RAM
+        LDA &8000
+        EOR #&FF
+        STA &8000
+        CMP &8000
+        BEQ ram
 
-.got_id
-    JMP epilogue
+        \ Enter ID mode and read ID bytes
+        LDA #&90:JSR command
+        LDX &8000
+        LDA &8001
+        PHA
+        LDA #&F0:JSR command
+        PLA
 
-.ram
-\ Oops, it was actually RAM! Restore the byte we clobbered and return an
-\ invalid ID of 00,01
-    EOR #&FF
-    STA &8000
-    LDX #&00
-    LDA #&01
-    JMP epilogue
+        \ Are the ID bytes the same as the first two bytes of the ROM?
+        CPX &8000
+        BNE got_id
+        CMP &8001
+        BNE got_id
+        \... if so, ID bytes are probably not valid
+        LDX #&00
+        LDA #&00
 
-.read_header
-    JSR prologue
-    JSR select_rom
-    LDX #0
-.readloop
-    LDA &8000, X
-    STA buf%, X
-    INX
-    BNE readloop
+    .got_id
+        JMP epilogue
 
-    LDX &8007
-    INX
-    LDA &8000, X
-    SEC:SBC #ASC("(")
-    BNE read_header_done
-    INX
-    LDA &8000,X
-    SEC:SBC #ASC("C")
-    BNE read_header_done
-    INX
-    LDA &8000,X
-    SEC:SBC #ASC(")")
+    .ram
+        \ RAM - restore original contents and return invalid ID
+        EOR #&FF
+        STA &8000
+        LDX #&00
+        LDA #&01
+        JMP epilogue
 
-.read_header_done
-    JMP epilogue
-]
-NEXT pass%
-IF P%-code% > 256 THEN STOP
-ENDPROC
+    \ Reads first 256 bytes of ROM into RAM
+    \ Call with A=ROM number
+    \ Returns with A=0 if copyright string "(C)" found, nonzero otherwise
+    .read_header
+        JSR prologue
+        JSR select_rom
+        LDX #0
+    .readloop
+        LDA &8000, X
+        STA buf%, X
+        INX
+        BNE readloop
+
+        LDX &8007
+        INX
+        LDA &8000, X
+        SEC:SBC #ASC("(")
+        BNE read_header_done
+        INX
+        LDA &8000,X
+        SEC:SBC #ASC("C")
+        BNE read_header_done
+        INX
+        LDA &8000,X
+        SEC:SBC #ASC(")")
+
+    .read_header_done
+        JMP epilogue
+    ]
+    NEXT pass%
+    IF P%-code% > 256 THEN STOP
+    ENDPROC

@@ -11,7 +11,7 @@
 \ If set, bundle a ROM image to create a 'self-contained' installer
 ROM_IMAGE =? ""
 
-\ 'Friendly' name for bundled ROM image, shown at startup. Defaults to ROM image filename.
+\ Friendly name for bundled ROM image, shown at startup. Defaults to ROM image filename.
 ROM_IMAGE_NAME =? ""
 
 \ MOS routines
@@ -33,25 +33,36 @@ romptr = &72    \ Pointer into ROM
 bufptr = &74    \ Pointer into RAM buffer
 
 ORG &1D00
+
+\ Make sure we leave enough room for the buffer!
+IF ROM_IMAGE = ""
+    GUARD &2000
+ELSE
+    GUARD &6000
+ENDIF
+
 .begin
 \ Check that we have enough free memory for the buffer
 \ We need up to &5FFF
     LDA #&84:JSR osbyte     \ OSBYTE &84 - read start of screen memory into XY
     CPY #&60:BCS ram_ok     \ Check high byte to make sure screen memory starts at >=&6000
     BRK
-    EQUS 0, "No room. Use MODE 6.", 0
+    EQUS 0, "No room", 0
 .ram_ok
-    LDA #&EA:LDX #0:LDY #$FF:JSR osbyte
+\ Make sure we're not running on a scond processor
+    LDA #&EA:LDX #0:LDY #$FF:JSR osbyte \ OSBYTE &EA - get/set tube presence byte
     TXA:BEQ tube_ok
     BRK
-    EQUS 0, "Can't run on Tube.", 0
+    EQUS 0, "Tube not supported", 0
 .exit
     RTS     \ Just a convenient place to put this, we branch to it in checks below
 .tube_ok
 
+\ Check if we're running on an Electron, and if so, patch the address of the
+\ ROM selection register
     LDA #&00:LDX #&01:JSR osbyte    \ OSBYTE &00,&01: return host type in X
     CPX #0:BNE not_elk              \ Are we running on an Electron?
-    LDA #LO(elk_romsel):STA romsel_sta+1 \ Yes, patch ourself to use &FE05 for ROMSEL
+    LDA #LO(elk_romsel):STA romsel_sta+1 \ Yes, patch ROMSEL address
 .not_elk
 
     LDX #(str_header - strings)
@@ -59,8 +70,7 @@ ORG &1D00
 
 \ Prompt for filename and load into buffer
 IF ROM_IMAGE = ""
-    LDX #(str_file_prompt - strings)
-    JSR print_string
+    LDX #(str_file_prompt - strings):JSR print_string
 
     LDA #0
     LDX #LO(ctl_filename_prompt):LDY #HI(ctl_filename_prompt)
@@ -85,8 +95,7 @@ ENDIF
 
 \ Prompt for ROM number to program
 .rom_prompt
-    LDX #(str_rom_prompt - strings)
-    JSR print_string
+    LDX #(str_rom_prompt - strings):JSR print_string
 
 \ We use the OSWORD 0 control block to restrict input to a single character
 \ between '0' and '3'
@@ -102,14 +111,13 @@ ENDIF
 \   - only 1 character
 \   - >= '0'
 \   - <= 'f'
+    AND #&DF                    \ Make chars shifted
     SEC:SBC #'0'
     CMP #&0A:BCC convert_done   \ got 0 - 9
     SBC #'A'-'0'-&0A
     CMP #&0A:BMI rom_prompt     \ exclude chars < A
     CMP #&10:BCC convert_done   \ got A - F
-    SBC #'a'-'A'
-    CMP #&0A:BMI rom_prompt     \ exclude chars < a
-.convert_done                   \ got a - f
+.convert_done
     PHA
 
 {
@@ -124,13 +132,13 @@ ENDIF
     CPY #0
     BNE ram         \ &00,&01 - writeable memory, probably sideways RAM
     BRK             \ &00,&00 - no ID, not writeable, probably real ROM
-    EQUS 0, "Can't program ROM.", 0
+    EQUS 0, "Can't: ROM", 0
 .ram
     BRK
-    EQUS 0, "Can't program SWRAM.", 0
+    EQUS 0, "Can't: SWRAM", 0
 .unknown
     BRK
-    EQUS 0, "Unknown chip.", 0
+    EQUS 0, "Unknown chip", 0
 .is_flash
 }
 
@@ -170,7 +178,7 @@ ENDIF
     CMP (bufptr), Y
     BEQ ok
     BRK
-    EQUS 0, "Verify failed.", 0
+    EQUS 0, "Verify failed", 0
 .ok
     INY
     BNE loop
@@ -180,7 +188,7 @@ ENDIF
 
 .finished
     LDX #(str_done - strings)
-\ Fall through to print 'Done' string and then exit
+\ Fall through to print_string and exit
 
 \ Print a null-terminated string
 \ Arguments:    X - offset of string to print from 'strings' label
@@ -201,7 +209,7 @@ INCLUDE "flashio.6502"
 
 .strings
 .str_header
-    EQUS "MultiROM flash cartridge mini-programmer", &0D
+    EQUS "MultiROM mini-programmer", &0D
 
     IF ROM_IMAGE <> ""
         EQUS "Preloaded with "
@@ -229,11 +237,7 @@ ENDIF
     EQUB '0'    \ Reject characters < '0'
     EQUB 'f'    \ Reject characters > 'f'
 
-IF ROM_IMAGE <> ""
-.buffer
-    INCBIN ROM_IMAGE
-    GUARD &6000
-ELSE
+IF ROM_IMAGE = ""
 .ctl_filename_prompt
     EQUW strbuf \ Read string to strbuf
     EQUB 255    \ Max length 255 chars
@@ -241,13 +245,18 @@ ELSE
     EQUB &7E
 .ctl_file_load
     EQUW strbuf \ Get filename from strbuf
-    EQUW buffer \ Load file to buffer
-    EQUW &0000
-    EQUW &0000
-    EQUW &0000
-    EQUW &0000
+    EQUD buffer \ Load file to buffer
+    EQUD &0000
+    EQUD &0000
+    EQUD &0000
+ENDIF
+
 .buffer
-    GUARD &2000
+    PRINT "Buffer starts at ", ~buffer
+    PRINT &2000-buffer, "bytes free."
+
+IF ROM_IMAGE <> ""
+    INCBIN ROM_IMAGE
 ENDIF
 
 .end
