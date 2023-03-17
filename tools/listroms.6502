@@ -1,0 +1,32 @@
+\ SaveROM: A simple tool to save Sideways ROM contents to a file.
+
+INCLUDE "common.6502"
+
+ORG &1D00
+GUARD &2000 \ probably not really necessary here, but might as well have a sanity check
+
+.begin
+\ Make sure we're not running on a second processor
+    OSCALL_AXY osbyte, &EA, &00, &FF     \ OSBYTE &EA - get/set tube presence byte
+    TXA:BEQ tube_ok
+    BRK:EQUS 0, "Tube not supported", 0
+.tube_ok
+
+\ Check if we're running on an Electron, and if so, patch the address of the
+\ ROM selection register
+    OSCALL_AX osbyte, &00, &01      \ OSBYTE &00,&01: return host type in X
+    CPX #0:BNE not_elk              \ Are we running on an Electron?
+    LDA #LO(elk_romsel):STA romsel_sta+1 \ Yes, patch ROMSEL address
+.not_elk
+
+    JMP print_roms
+
+DISABLE_ERASE_CHIP=TRUE
+DISABLE_ERASE_ROM=TRUE
+DISABLE_ERASE_SECTOR=TRUE
+DISABLE_WRITE_BYTE=TRUE
+INCLUDE "flashio.6502"
+
+.end
+
+SAVE begin, end, begin

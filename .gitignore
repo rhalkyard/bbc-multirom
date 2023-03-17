@@ -50,3 +50,11 @@ fp-info-cache
 *.sim
 *.so
 *.wo
+
+# Tools build output
+*.ssd
+tools/cartprg
+tools/listrom
+tools/saverom
+
+release/

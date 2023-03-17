@@ -14,53 +14,29 @@ ROM_IMAGE =? ""
 \ Friendly name for bundled ROM image, shown at startup. Defaults to ROM image filename.
 ROM_IMAGE_NAME =? ""
 
-\ MOS routines
-osasci = &FFE3
-osbyte = &FFF4
-osfile = &FFDD
-osword = &FFF1
-
-\ System locations
-romzp = &F4         \ RAM copy of ROMSEL register
-romsel = &FE30      \ Sideways ROM paging register (for Master)
-elk_romsel = &FE05  \ Sideways ROM paging register (for Electron)
-
-strbuf = &0600  \ BASIC won't mind if we borrow its string buffer
-
-\ Variables
-romsav = &70    \ Previous ROM number to restore
-romptr = &72    \ Pointer into ROM
-bufptr = &74    \ Pointer into RAM buffer
+INCLUDE "common.6502"
 
 ORG &1D00
-
-\ Make sure we leave enough room for the buffer!
-IF ROM_IMAGE = ""
-    GUARD &2000
-ELSE
-    GUARD &6000
-ENDIF
+GUARD &6000
 
 .begin
 \ Check that we have enough free memory for the buffer
 \ We need up to &5FFF
-    LDA #&84:JSR osbyte     \ OSBYTE &84 - read start of screen memory into XY
+    OSCALL_A osbyte, &84    \ OSBYTE &84: read start of screen memory into XY
     CPY #&60:BCS ram_ok     \ Check high byte to make sure screen memory starts at >=&6000
-    BRK
-    EQUS 0, "No room", 0
+    LDA #&16:JSR osasci:LDA #&06:JSR osasci \ Switch into a suitable mode
 .ram_ok
-\ Make sure we're not running on a scond processor
-    LDA #&EA:LDX #0:LDY #$FF:JSR osbyte \ OSBYTE &EA - get/set tube presence byte
+\ Make sure we're not running on a second processor
+    OSCALL_AXY osbyte, &EA, &00, &FF     \ OSBYTE &EA - get/set tube presence byte
     TXA:BEQ tube_ok
-    BRK
-    EQUS 0, "Tube not supported", 0
+    BRK:EQUS 0, "Tube not supported", 0
 .exit
     RTS     \ Just a convenient place to put this, we branch to it in checks below
 .tube_ok
 
 \ Check if we're running on an Electron, and if so, patch the address of the
 \ ROM selection register
-    LDA #&00:LDX #&01:JSR osbyte    \ OSBYTE &00,&01: return host type in X
+    OSCALL_AX osbyte, &00, &01      \ OSBYTE &00,&01: return host type in X
     CPX #0:BNE not_elk              \ Are we running on an Electron?
     LDA #LO(elk_romsel):STA romsel_sta+1 \ Yes, patch ROMSEL address
 .not_elk
@@ -72,9 +48,8 @@ ENDIF
 IF ROM_IMAGE = ""
     LDX #(str_file_prompt - strings):JSR print_string
 
-    LDA #0
-    LDX #LO(ctl_filename_prompt):LDY #HI(ctl_filename_prompt)
-    JSR osword      \ OSWORD &00 - read line from console
+    \ OSWORD &00 - read line from console
+    OSCALL_WORD osword, &00, ctl_filename_prompt
     BCS exit        \ Escape pressed? get outta here
 
     LDA strbuf
@@ -86,22 +61,17 @@ IF ROM_IMAGE = ""
     BEQ rom_prompt  \ always taken
 
 .load_file
-    LDA #&FF:PHA    \ push nonzero 'program enable' flag onto stack
-    LDX #LO(ctl_file_load):LDY #HI(ctl_file_load)
-    JSR osfile      \ OSFILE &FF - load whole file into memory
-ELSE
-    LDA #&FF:PHA    \ Always set program-enable flag with bundled ROM
+    OSCALL_WORD osfile, &FF, ctl_file_load
+    JSR osfile
 ENDIF
+    LDA #&FF:PHA    \ Always set program-enable flag with bundled ROM
 
 \ Prompt for ROM number to program
 .rom_prompt
     LDX #(str_rom_prompt - strings):JSR print_string
 
-\ We use the OSWORD 0 control block to restrict input to a single character
-\ between '0' and '3'
-    LDA #0
-    LDX #LO(ctl_rom_prompt):LDY #HI(ctl_rom_prompt)
-    JSR osword      \ OSWORD &00 - read line from console
+    \ OSWORD &00 - read line from console
+    OSCALL_WORD osword, &00, ctl_rom_prompt
     BCS exit        \ Escape pressed? get outta here
 
     LDA strbuf:CMP #&0D:BEQ rom_prompt  \ Blank line? try again
@@ -111,12 +81,12 @@ ENDIF
 \   - only 1 character
 \   - >= '0'
 \   - <= 'f'
-    AND #&DF                    \ Make chars shifted
-    SEC:SBC #'0'
-    CMP #&0A:BCC convert_done   \ got 0 - 9
-    SBC #'A'-'0'-&0A
+    CMP #'9'+1:BPL char
+    SEC:SBC #'0':BCS convert_done
+.char
+    AND #&DF:SEC:SBC #'A'-&0A
     CMP #&0A:BMI rom_prompt     \ exclude chars < A
-    CMP #&10:BCC convert_done   \ got A - F
+    CMP #&10:BCS rom_prompt     \ exclude chars > F
 .convert_done
     PHA
 
@@ -205,11 +175,15 @@ ENDIF
     RTS
 }
 
+DISABLE_ERASE_CHIP = TRUE
+DISABLE_PRINT_ROMS = TRUE
+DISABLE_PRINT_ROMSTR = TRUE
+DISABLE_ROM_VALID = TRUE
 INCLUDE "flashio.6502"
 
 .strings
 .str_header
-    EQUS "MultiROM mini-programmer", &0D
+    EQUS "MultiROM Cartridge Programmer", &0D
 
     IF ROM_IMAGE <> ""
         EQUS "Preloaded with "
@@ -227,7 +201,7 @@ IF ROM_IMAGE = ""
     EQUS "ROM Filename (blank to erase)? ", 0
 ENDIF
 .str_rom_prompt
-    EQUS "Slot # (0-F)? ", 0
+    EQUS "ROM # to program (0-F)? ", 0
 .str_done
     EQUS "Done.", &0D, 0
 
@@ -239,13 +213,14 @@ ENDIF
 
 IF ROM_IMAGE = ""
 .ctl_filename_prompt
-    EQUW strbuf \ Read string to strbuf
-    EQUB 255    \ Max length 255 chars
-    EQUB &20    \ Accept any printable character
+    EQUW strbuf     \ Read string to strbuf
+    EQUB 255        \ Max length 255 chars
+    EQUB &20,&7E    \ Accept any printable character
     EQUB &7E
 .ctl_file_load
     EQUW strbuf \ Get filename from strbuf
     EQUD buffer \ Load file to buffer
+    EQUD &0000
     EQUD &0000
     EQUD &0000
     EQUD &0000
@@ -257,9 +232,10 @@ ENDIF
 
 IF ROM_IMAGE <> ""
     INCBIN ROM_IMAGE
+.end
+ELSE
+.end
+    SKIP 16384
 ENDIF
 
-.end
-
 SAVE begin, end, begin
-PUTBASIC "listroms.bbc", "rlist"

@@ -1,0 +1,13 @@
+ORG &0000
+.begin
+EQUS "*BASIC", &0D
+EQUS "MODE 0", &0D
+EQUS "*TYPE README", &0D
+.end
+
+SAVE "!BOOT", begin, end, &FFFFFF
+
+PUTTEXT "README.txt", "README", &3FFFF
+PUTFILE "cartprg", &1D00, &1D00
+PUTFILE "saverom", &1D00, &1D00
+PUTFILE "listrom", &1D00, &1D00

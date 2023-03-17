@@ -1,0 +1,43 @@
+\ Common constants and macros used by all tools
+
+\ MOS routines
+osnewl = &FFE7
+osasci = &FFE3
+osbyte = &FFF4
+osfile = &FFDD
+osword = &FFF1
+
+\ System locations
+romzp = &F4         \ RAM copy of ROMSEL register
+romsel = &FE30      \ Sideways ROM paging register (for Master)
+elk_romsel = &FE05  \ Sideways ROM paging register (for Electron)
+
+strbuf = &0600  \ BASIC won't mind if we borrow its string buffer
+
+\ Variables
+romsav = &70    \ Previous ROM number to restore
+copyright_offset = &71 \ Offset of copyright string, set by rom_valid
+romptr = &72    \ Pointer into ROM (2 bytes)
+bufptr = &74    \ Pointer into RAM buffer (2 bytes)
+
+\ Helper macros for OS calls
+\ e.g. OSCALL_AX osbyte, &00, &01
+\      OSCALL_WORD osword, &00, &1234
+MACRO OSCALL_A entrypoint, a_reg
+    LDA #a_reg
+    JSR entrypoint
+ENDMACRO
+
+MACRO OSCALL_AX entrypoint, a_reg, x_reg
+    LDX #x_reg
+    OSCALL_A entrypoint, a_reg
+ENDMACRO
+
+MACRO OSCALL_AXY entrypoint, a_reg, x_reg, y_reg
+    LDY #y_reg
+    OSCALL_AX entrypoint, a_reg, x_reg
+ENDMACRO
+
+MACRO OSCALL_WORD entrypoint, a_reg, xy_reg
+    OSCALL_AXY entrypoint, a_reg, LO(xy_reg), HI(xy_reg)
+ENDMACRO
