@@ -526,6 +526,6 @@
   ],
   "text_variables": {
     "PCBFab_placeholder": "",
-    "VERSION": "(VERSION NOT SET)"
+    "VERSION": ""
   }
 }
