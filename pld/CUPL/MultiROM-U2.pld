@@ -15,10 +15,10 @@ PIN 2   = M_RW ;        /* BBC Master Read/!Write. Unused on Electron */
 PIN 3   = M_CS_E_RW ;   /* Master: active-high select. Electron: Read/!Write */
 PIN 4   = !ROMOE ;      /* Cartridge select line */
 PIN 5   = ROMQA ;       /* ROM low/high select */
-PIN 6   = !A16H ;       /* Bank-select switch input for high ROM */
-PIN 7   = !A15H ;       /* Bank-select switch input for high ROM */
-PIN 8   = !A16L ;       /* Bank-select switch input for low ROM */
-PIN 9   = !A15L ;       /* Bank-select switch input for low ROM */
+PIN 6   = !A15H ;       /* Bank-select switch input for high ROM */
+PIN 7   = !A16H ;       /* Bank-select switch input for high ROM */
+PIN 8   = !A15L ;       /* Bank-select switch input for low ROM */
+PIN 9   = !A16L ;       /* Bank-select switch input for low ROM */
 /* PIN 10 = GND */
 PIN 11  = !MADET ;      /* Master/Electron sense */
 
@@ -41,10 +41,7 @@ PIN 19  = A16 ;         /* Flash address line A16 */
 A15     = !ROMQA & A15L             # ROMQA & A15H ;
 A16     = !ROMQA & A16L             # ROMQA & A16H ;
 
-/* Selection logic                                                      */
-$DEFINE SEL (ROMOE & Phi2)
-CS      =   SEL;
-
 /*          Master                          Electron                    */
-OE      =   MADET & SEL & M_RW              # !MADET & SEL & M_CS_E_RW ;
-PGM     =   MADET & !M_RW                   # !MADET & !M_CS_E_RW ;
+CS      =   MADET & M_CS_E_RW & Phi2    # !MADET & ROMOE & Phi2 ;
+OE      =   MADET & ROMOE & M_RW        # !MADET & ROMOE & M_CS_E_RW ;
+PGM     =   MADET & !M_RW               # !MADET & !M_CS_E_RW ;

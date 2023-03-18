@@ -5,13 +5,13 @@ MRU2    ; Identifier
 ; Name    Pin   I/O     Description
 Phi2    ; 1     Input   Processor clock
 RWm     ; 2     Input   BBC Master read/write, unused on Electron
-RWe     ; 3     Input   Electron read/write, active-high chip select on Master
+RWeCSm  ; 3     Input   Electron read/write, active-high chip select on Master
 /ROMOE  ; 4     Input   Cartridge select line
 ROMQA   ; 5     Input   ROM low/high select
-/A16H   ; 6     Input   Bank-select DIP switch
-/A15H   ; 7     Input   "
-/A16L   ; 8     Input   "
-/A15L   ; 9     Input   "
+/A15H   ; 6     Input   Bank-select DIP switch
+/A16H   ; 7     Input   "
+/A15L   ; 8     Input   "
+/A16L   ; 9     Input   "
 GND     ; 10
 /MADET  ; 11    Input   Master/Electron sense.
 /CS     ; 12    Output  Flash chip select
@@ -29,12 +29,11 @@ VCC     ; 20
 A15     = /ROMQA * A15L     + ROMQA * A15H
 A16     = /ROMQA * A16L     + ROMQA * A16H
 
-CS      = ROMOE * Phi2
-
 ; Read/write decoding differs between Master and Electron
 ;       Master                          Electron
-OE      = MADET * ROMOE * Phi2 * RWm    + /MADET * ROMOE * Phi2 * RWe
-PGM     = MADET * /RWm                  + /MADET * /RWe
+CS      = MADET * RWeCSm * Phi2         + /MADET * ROMOE * Phi2
+OE      = MADET * ROMOE * RWm           + /MADET * ROMOE * RWeCSm
+PGM     = MADET * /RWm                  + /MADET * /RWeCSm
 
 DESCRIPTION:
 

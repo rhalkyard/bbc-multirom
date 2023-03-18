@@ -8,7 +8,7 @@ This directory contains CUPL and GALasm source for the 16V8 GAL used to provide 
 
 CUPL source suitable for WinCUPL can be found in the `cupl/` subdirectory
 
-WinCUPL can be [downloaded](https://www.microchip.com/en-us/products/fpgas-and-plds/spld-cplds/pld-design-resources) free from Atmel, but is available only for Windows, and the GUI does not work on anything newer than Windows XP.
+WinCUPL can be [downloaded](https://www.microchip.com/en-us/products/fpgas-and-plds/spld-cplds/pld-design-resources) free from Atmel, but is available only for Windows, and the GUI is broken on anything newer than Windows XP.
 
 [cupl/build.bat](cupl/build.bat) builds the source using WinCUPL's command-line compiler, which does still work on modern systems.
 
@@ -22,4 +22,4 @@ GALasm source and a `Makefile` to build it can be found in the `GALasm/` directo
 
 CUPL and GALasm both produce numerous output files, but the one that matters is the JEDEC fuse map with a `.jed` extension.
 
-The cheap and ubiquitous [XGecu](http://www.autoelectric.cn/en/TL866_main.html) (aka TL866) USB programmers are capable of programming this file onto the chip.
+The cheap and ubiquitous [XGecu](http://www.autoelectric.cn/en/TL866_main.html) (a.k.a. TL866) USB programmers are capable of programming this file onto the chip.
