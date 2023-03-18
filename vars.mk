@@ -9,7 +9,7 @@ COMMIT := $(shell git rev-parse --short HEAD)
 DATE := $(shell git log -1 --format=%cd --date=format:"%Y%m%d")
 VERSION := $(TAG:v%=%)
 ifneq ($(COMMIT), $(TAG_COMMIT))
-    VERSION := $(VERSION)-next-$(COMMIT)-$(DATE)
+    VERSION := $(VERSION)+$(COMMIT)-$(DATE)
 endif
 ifeq ($(VERSION),)
     VERSION := $(COMMIT)-$(DATE)
