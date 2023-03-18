@@ -125,15 +125,21 @@ ENDIF
     LDA #&00:STA romptr
     LDA #&80:STA romptr+1
     LDY #0
+
 {
 .loop
     LDA (bufptr),Y
     JSR write_byte
     INY
     BNE loop
+    LDA #1:BIT romptr+1:BNE skipprint
+    LDA #'*'
+    JSR osasci
+.skipprint
     INC romptr+1:INC bufptr+1
     LDA romptr+1:CMP #&C0:BNE loop
 }
+    JSR osnewl
 
 \ Verify programmed ROM against buffer
     LDA #LO(buffer):STA bufptr
@@ -152,9 +158,14 @@ ENDIF
 .ok
     INY
     BNE loop
+    LDA #1:BIT romptr+1:BNE skipprint
+    LDA #'#'
+    JSR osasci
+.skipprint
     INC romptr+1:INC bufptr+1
     LDA romptr+1:CMP #&C0:BNE loop
 }
+    JSR osnewl
 
 .finished
     LDX #(str_done - strings)
