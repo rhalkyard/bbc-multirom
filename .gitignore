@@ -5,6 +5,7 @@
 *.000
 *.bak
 *.bck
+*.kicad_pro-bak
 *.kicad_pcb-bak
 *.kicad_sch-bak
 *-backups
@@ -53,8 +54,16 @@ fp-info-cache
 
 # Tools build output
 *.ssd
+tools/version.txt
+tools/README_disc.txt
 tools/cartprg
 tools/listrom
 tools/saverom
+
+# Kibot stuff
+pcb/build/
+pcb/Makefile.kibot
+pcb/kibot_error.log
+pcb/version.txt
 
 release/

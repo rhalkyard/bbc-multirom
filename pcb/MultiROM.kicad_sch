@@ -6,8 +6,8 @@
 
   (title_block
     (title "MultiROM Cartridge for BBC Master & Acorn Electron")
-    (date "2023-02-07")
-    (rev "Issue 1")
+    (date "2023-03-18")
+    (rev "${VERSION}")
   )
 
   (lib_symbols

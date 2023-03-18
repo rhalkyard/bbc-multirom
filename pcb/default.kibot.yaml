@@ -1,0 +1,344 @@
+kibot:
+  version: 1
+
+import:
+- file: Elecrow
+- file: FusionPCB
+- file: JLCPCB
+- file: PCBWay
+
+# global:
+#   restore_project: true
+
+preflight:
+  set_text_variables:
+    - name: VERSION
+      command: "cat version.txt || echo '(no version)'"
+
+outputs:
+- name: bom_html
+  comment: Generic Bill of Materials in HTML format
+  type: bom
+  options:
+    format: HTML
+    count_smd_tht: true
+
+- name: bom_csv
+  comment: Generic Bill of Materials in CSV format
+  type: bom
+  options:
+    format: CSV
+    count_smd_tht: true
+
+- name: basic_excellon
+  comment: Drill files in EXCELLON format
+  type: excellon
+  dir: Gerbers_and_Drill
+  options:
+    map: pdf
+
+- name: basic_gerb_drill
+  comment: Drill files in GERB_DRILL format
+  type: gerb_drill
+  dir: Gerbers_and_Drill
+  options:
+    map: gerber
+
+- name: gerber_modern
+  comment: Gerbers in modern format, recommended by the standard
+  type: gerber
+  dir: Gerbers_and_Drill
+  layers:
+  - layer: F.Cu
+    suffix: F_Cu
+    description: Front copper
+  - layer: B.Cu
+    suffix: B_Cu
+    description: Bottom copper
+  - layer: B.Silkscreen
+    suffix: B_Silkscreen
+    description: Bottom silkscreen (artwork)
+  - layer: F.Silkscreen
+    suffix: F_Silkscreen
+    description: Front silkscreen (artwork)
+  - layer: B.Mask
+    suffix: B_Mask
+    description: Bottom soldermask (negative)
+  - layer: F.Mask
+    suffix: F_Mask
+    description: Front soldermask (negative)
+  - layer: User.Drawings
+    suffix: User_Drawings
+    description: User drawings
+  - layer: Edge.Cuts
+    suffix: Edge_Cuts
+    description: Board shape
+  - layer: B.Courtyard
+    suffix: B_Courtyard
+    description: Bottom courtyard area
+  - layer: F.Courtyard
+    suffix: F_Courtyard
+    description: Front courtyard area
+  - layer: B.Fab
+    suffix: B_Fab
+    description: Bottom documentation
+  - layer: F.Fab
+    suffix: F_Fab
+    description: Front documentation
+
+- name: JLCPCB_gerbers
+  comment: Gerbers compatible with JLCPCB
+  type: gerber
+  dir: Manufacturers/JLCPCB
+  extends: _JLCPCB_gerbers
+  disable_run_by_default: true
+  layers: &id002
+  - layer: F.Cu
+    suffix: F_Cu
+    description: Front copper
+  - layer: B.Cu
+    suffix: B_Cu
+    description: Bottom copper
+  - layer: B.Silkscreen
+    suffix: B_Silkscreen
+    description: Bottom silkscreen (artwork)
+  - layer: F.Silkscreen
+    suffix: F_Silkscreen
+    description: Front silkscreen (artwork)
+  - layer: B.Mask
+    suffix: B_Mask
+    description: Bottom soldermask (negative)
+  - layer: F.Mask
+    suffix: F_Mask
+    description: Front soldermask (negative)
+  - layer: Edge.Cuts
+    suffix: Edge_Cuts
+    description: Board shape
+
+- name: JLCPCB_drill
+  comment: Drill files compatible with JLCPCB
+  type: excellon
+  dir: Manufacturers/JLCPCB
+  extends: _JLCPCB_drill
+  disable_run_by_default: true
+
+- name: JLCPCB_bom
+  comment: BoM for JLCPCB
+  type: bom
+  dir: Manufacturers/JLCPCB
+  extends: _JLCPCB_bom
+  disable_run_by_default: true
+
+- name: JLCPCB_position
+  comment: Pick and place file, JLCPCB style
+  type: position
+  dir: Manufacturers/JLCPCB
+  extends: _JLCPCB_position
+  disable_run_by_default: true
+
+- name: JLCPCB
+  comment: ZIP file for JLCPCB
+  type: compress
+  dir: Manufacturers
+  extends: ''
+  disable_run_by_default: _JLCPCB_compress
+  options:
+    files:
+    - from_output: JLCPCB_gerbers
+      dest: /
+    - from_output: JLCPCB_drill
+      dest: /
+
+- name: Elecrow_gerbers
+  comment: Gerbers compatible with Elecrow
+  type: gerber
+  dir: Manufacturers/Elecrow
+  extends: _Elecrow_gerbers
+  disable_run_by_default: true
+  layers: *id002
+
+- name: Elecrow_drill
+  comment: Drill files compatible with Elecrow
+  type: excellon
+  dir: Manufacturers/Elecrow
+  extends: _Elecrow_drill
+  disable_run_by_default: true
+
+- name: Elecrow
+  comment: ZIP file for Elecrow
+  type: compress
+  dir: Manufacturers
+  extends: ''
+  disable_run_by_default: _Elecrow_compress
+  options:
+    files:
+    - from_output: Elecrow_gerbers
+      dest: /
+    - from_output: Elecrow_drill
+      dest: /
+
+- name: FusionPCB_gerbers
+  comment: Gerbers compatible with FusionPCB
+  type: gerber
+  dir: Manufacturers/FusionPCB
+  extends: _FusionPCB_gerbers
+  disable_run_by_default: true
+  layers: *id002
+
+- name: FusionPCB_drill
+  comment: Drill files compatible with FusionPCB
+  type: excellon
+  dir: Manufacturers/FusionPCB
+  extends: _FusionPCB_drill
+  disable_run_by_default: true
+
+- name: FusionPCB
+  comment: ZIP file for FusionPCB
+  type: compress
+  dir: Manufacturers
+  extends: ''
+  disable_run_by_default: _FusionPCB_compress
+  options:
+    files:
+    - from_output: FusionPCB_gerbers
+      dest: /
+    - from_output: FusionPCB_drill
+      dest: /
+
+- name: PCBWay_gerbers
+  comment: Gerbers compatible with PCBWay
+  type: gerber
+  dir: Manufacturers/PCBWay
+  extends: _PCBWay_gerbers
+  disable_run_by_default: true
+  layers: *id002
+
+- name: PCBWay_drill
+  comment: Drill files compatible with PCBWay
+  type: excellon
+  dir: Manufacturers/PCBWay
+  extends: _PCBWay_drill
+  disable_run_by_default: true
+
+- name: PCBWay
+  comment: ZIP file for PCBWay
+  type: compress
+  dir: Manufacturers
+  extends: ''
+  disable_run_by_default: _PCBWay_compress
+  options:
+    files:
+    - from_output: PCBWay_gerbers
+      dest: /
+    - from_output: PCBWay_drill
+      dest: /
+
+- name: basic_ibom
+  comment: Interactive HTML BoM
+  type: ibom
+
+- name: basic_pcb_print_pdf
+  comment: PCB
+  type: pcb_print
+  options:
+    output: '%f-pcb%I%v.%x'
+    format: PDF
+    pages:
+    - layers:
+      - layer: F.Cu
+      - layer: F.Mask
+        color: '#14332440'
+      - layer: F.Silkscreen
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      sheet: Front copper
+    - layers:
+      - layer: B.Cu
+      - layer: B.Mask
+        color: '#14332440'
+      - layer: B.Silkscreen
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      mirror: true
+      sheet: Bottom copper
+    - layers:
+      - layer: B.Courtyard
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      mirror: true
+      sheet: Bottom courtyard area
+    - layers:
+      - layer: F.Courtyard
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      sheet: Front courtyard area
+    - layers:
+      - layer: B.Fab
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      mirror: true
+      sheet: Bottom documentation
+    - layers:
+      - layer: F.Fab
+      - layer: Edge.Cuts
+      - layer: User.Drawings
+      sheet: Front documentation
+    keep_temporal_files: false
+
+- name: basic_pdf_sch_print
+  comment: Schematic in PDF format
+  type: pdf_sch_print
+
+- name: basic_render_3d_top
+  comment: 3D view from top
+  type: render_3d
+  dir: renders
+  options:
+    ray_tracing: true
+    orthographic: true
+- name: basic_render_3d_30deg
+  comment: 3D view from 30 degrees
+  type: render_3d
+  dir: renders
+  output_id: 30deg
+  options:
+    ray_tracing: true
+    rotate_x: 3
+    rotate_z: -2
+- name: basic_render_3d_bottom
+  comment: 3D view from bottom
+  type: render_3d
+  dir: renders
+  options:
+    ray_tracing: true
+    orthographic: true
+    view: bottom
+- name: basic_render_3d_bottom30deg
+  comment: 3D view from 30 degrees
+  type: render_3d
+  dir: renders
+  output_id: 30deg
+  options:
+    ray_tracing: true
+    view: bottom
+    rotate_x: 3
+    rotate_z: 2
+
+# - name: report_simple
+#   comment: Simple design report
+#   type: report
+#   output_id: _simple
+#   options:
+#     template: simple_ASCII
+#     do_convert: true
+
+# - name: report_full
+#   comment: Full design report
+#   type: report
+#   options:
+#     template: full_SVG
+#     do_convert: true
+
+- name: basic_step
+  comment: 3D model in STEP format
+  type: step

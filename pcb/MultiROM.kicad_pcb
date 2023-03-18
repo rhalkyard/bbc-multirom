@@ -7,6 +7,8 @@
   (paper "USLetter")
   (title_block
     (title "Cartridge for BBC Master & Acorn Electron")
+    (date "2023-03-18")
+    (rev "${VERSION}")
   )
 
   (layers
@@ -86,6 +88,7 @@
   )
 
   (property "PCBFab_placeholder" "")
+  (property "VERSION" "(NO VERSION)")
 
   (net 0 "")
   (net 1 "GND")
@@ -474,7 +477,7 @@
       (net 1 "GND") (pintype "passive") (tstamp fca11282-8cc4-41a0-81b0-b142e7255cc6))
     (pad "8" thru_hole oval (at 7.62 0 90) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 1 "GND") (pintype "passive") (tstamp 6647603c-4afa-478c-a0a4-ed1a5fd0283d))
-    (model "${KICAD6_3DMODEL_DIR}/Button_Switch_THT.3dshapes/SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Button_Switch_THT.3dshapes/SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 90))
@@ -635,7 +638,7 @@
       (net 2 "VCC") (pintype "passive") (tstamp 911c700e-2ca6-4f52-9df0-fe394ec6497e))
     (pad "2" thru_hole circle (at 2.5 0 180) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 1 "GND") (pintype "passive") (tstamp b72c296c-03f2-4c4c-a156-af4edc678b1d))
-    (model "${KICAD6_3DMODEL_DIR}/Capacitor_THT.3dshapes/C_Disc_D3.0mm_W1.6mm_P2.50mm.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Capacitor_THT.3dshapes/C_Disc_D3.0mm_W1.6mm_P2.50mm.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -736,7 +739,7 @@
       (net 48 "/A16") (pinfunction "IO1") (pintype "tri_state") (tstamp b967242d-db81-468b-b139-55e2521bb284))
     (pad "20" thru_hole oval (at 7.62 0) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 2 "VCC") (pinfunction "VCC") (pintype "power_in") (tstamp b8744b99-51e2-4f76-ab61-e1ce5ce68c23))
-    (model "${KICAD6_3DMODEL_DIR}/Package_DIP.3dshapes/DIP-20_W7.62mm.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Package_DIP.3dshapes/DIP-20_W7.62mm.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -806,7 +809,7 @@
       (net 43 "/~{Hi_A16}") (pinfunction "R4") (pintype "passive") (tstamp 055b6224-a99b-4369-ae21-ae108672ce33))
     (pad "6" thru_hole oval (at 12.7 0 270) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 44 "/~{Hi_A15}") (pinfunction "R5") (pintype "passive") (tstamp 2e2276d7-6686-4b70-b80b-80006a0991b0))
-    (model "${KICAD6_3DMODEL_DIR}/Resistor_THT.3dshapes/R_Array_SIP6.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Resistor_THT.3dshapes/R_Array_SIP6.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -930,7 +933,7 @@
       (net 53 "/~{PGM}") (pinfunction "PGM") (pintype "input") (tstamp 96368c6d-509d-4fb5-8ef5-749cddbcdf51))
     (pad "32" thru_hole oval (at 15.24 0) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 2 "VCC") (pinfunction "VCC") (pintype "power_in") (tstamp b6924f13-e051-4d97-bc46-e110a8fd840e))
-    (model "${KICAD6_3DMODEL_DIR}/Package_DIP.3dshapes/DIP-32_W15.24mm.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Package_DIP.3dshapes/DIP-32_W15.24mm.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -984,7 +987,7 @@
       (net 2 "VCC") (pintype "passive") (tstamp dd5c6a44-206a-40d9-97d8-094412119f6e))
     (pad "2" thru_hole circle (at 2.5 0 180) (size 1.6 1.6) (drill 0.8) (layers "*.Cu" "*.Mask")
       (net 1 "GND") (pintype "passive") (tstamp 8a03c7e1-8055-42b6-8068-946310b91d91))
-    (model "${KICAD6_3DMODEL_DIR}/Capacitor_THT.3dshapes/C_Disc_D3.0mm_W1.6mm_P2.50mm.wrl"
+    (model "${KICAD7_3DMODEL_DIR}/Capacitor_THT.3dshapes/C_Disc_D3.0mm_W1.6mm_P2.50mm.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
@@ -1062,7 +1065,7 @@
   (gr_text "MultiROM" (at 30.48 57.785 90) (layer "F.SilkS") (tstamp 1e10c5c7-1fe9-4d62-8237-eec8fede6084)
     (effects (font (size 3 3) (thickness 0.6) bold italic) (justify left bottom))
   )
-  (gr_text "github.com/rhalkyard/bbc-multirom\nIssue 1" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
+  (gr_text "github.com/rhalkyard/bbc-multirom\n${VERSION}" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
     (effects (font (size 1 1) (thickness 0.125)) (justify left top))
   )
   (gr_text "This side to front" (at 110.49 28.575) (layer "F.SilkS") (tstamp 6b90ec4d-9008-4361-918b-c87f78bedacf)

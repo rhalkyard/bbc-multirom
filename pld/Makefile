@@ -1,6 +1,6 @@
-GALASM:=galasm
+include ../vars.mk
 
-default: MultiROM-U2.jed
+all: MultiROM-U2.jed
 .PHONY: default clean
 
 clean:
