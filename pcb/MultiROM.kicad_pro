@@ -524,5 +524,7 @@
       ""
     ]
   ],
-  "text_variables": {}
+  "text_variables": {
+    "PCBFab_placeholder": ""
+  }
 }

@@ -85,6 +85,8 @@
     )
   )
 
+  (property "PCBFab_placeholder" "")
+
   (net 0 "")
   (net 1 "GND")
   (net 2 "VCC")
@@ -1045,6 +1047,9 @@
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (tstamp ee99ebc3-68d9-4324-a0b5-f4b41bf92d02))
   (gr_line (start 111.125 76.2) (end 97.79 76.2)
     (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (tstamp fc050279-c099-440d-b88d-7f54e1b45b25))
+  (gr_text "${PCBFab_placeholder}" (at 81.788 54.864 270) (layer "B.SilkS") (tstamp d8e22a3d-146f-4e93-ac34-c1dc24240298)
+    (effects (font (size 1 1) (thickness 0.15)) (justify left bottom mirror))
+  )
   (gr_text "This side to rear" (at 110.49 28.575) (layer "B.SilkS") (tstamp ec8bc60a-54a7-4ab3-ae16-fc9d49b134d5)
     (effects (font (size 1.25 1.25) (thickness 0.1875)) (justify left bottom mirror))
   )
