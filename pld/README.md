@@ -1,25 +1,23 @@
 # PLD files for MultiROM
 
-This directory contains CUPL and GALasm source for the 16V8 GAL used to provide selection and addressing logic.
+This directory contains GALasm source for the 16V8 PLD used to provide selection and addressing logic.
 
 ## Building
 
-### Building with WinCUPL
+Install [GALasm](https://github.com/daveho/GALasm) or [galette](https://github.com/simon-frankau/galette), then run `make` in this directory.
 
-CUPL source suitable for WinCUPL can be found in the `cupl/` subdirectory
+GALasm produces several output files of varying usefulness:
 
-WinCUPL can be [downloaded](https://www.microchip.com/en-us/products/fpgas-and-plds/spld-cplds/pld-design-resources) free from Atmel, but is available only for Windows, and the GUI is broken on anything newer than Windows XP.
+- `.chp` - ASCII-art of chip, with pin names
 
-[cupl/build.bat](cupl/build.bat) builds the source using WinCUPL's command-line compiler, which does still work on modern systems.
+- `.fus` - tabular description of fuse states
 
-### Building with GALasm
+- `.jed` - JEDEC fuse-map file, for programming onto device
 
-GALasm source and a `Makefile` to build it can be found in the `GALasm/` directory.
-
-[GALasm](https://github.com/daveho/GALasm) is a free cross-platform tool for compiling GAL logic. It's just as old and crusty as WinCUPL, but it will at least run on OSes other than Windows. However, its license strictly forbids any commercial use.
+- `.pin` - ASCII table of pin names
 
 ## Programming
 
-CUPL and GALasm both produce numerous output files, but the one that matters is the JEDEC fuse map with a `.jed` extension.
+Note that the GAL16V8 device specified in the source is out of production. The [Atmel ATF16V8B](https://www.microchip.com/en-us/product/ATF16V8B) is a compatible in-production equivalent.
 
-The cheap and ubiquitous [XGecu](http://www.autoelectric.cn/en/TL866_main.html) (a.k.a. TL866) USB programmers are capable of programming this file onto the chip.
+The ubiquitous [XGecu](http://www.autoelectric.cn/en/TL866_main.html) (a.k.a. TL866) USB programmers are probably the cheapest and easiest way to program small PLDs (and numerous other chips).

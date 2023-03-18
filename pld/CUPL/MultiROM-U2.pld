@@ -41,7 +41,7 @@ PIN 19  = A16 ;         /* Flash address line A16 */
 A15     = !ROMQA & A15L             # ROMQA & A15H ;
 A16     = !ROMQA & A16L             # ROMQA & A16H ;
 
-/*          Master                    Electron                          */
-CS      =   MADET & RWe_CSm & Phi2  # !MADET & ROMOE & Phi2 ;
-OE      =   MADET & ROMOE & RWm     # !MADET & ROMOE & RWe_CSm ;
-PGM     =   MADET & !RWm            # !MADET & !RWe_CSm ;
+/*        Master                    Electron                            */
+CS      = MADET & RWe_CSm & Phi2    # !MADET & ROMOE & Phi2 ;
+OE      = MADET & ROMOE & RWm       # !MADET & ROMOE & RWe_CSm ;
+PGM     = MADET & !RWm              # !MADET & !RWe_CSm ;
