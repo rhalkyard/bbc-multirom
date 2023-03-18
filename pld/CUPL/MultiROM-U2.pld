@@ -11,8 +11,8 @@ Device      g16v8 ;
 
 /* *************** INPUT PINS *******************************************/
 PIN 1   = Phi2 ;        /* Processor clock */
-PIN 2   = M_RW ;        /* BBC Master Read/!Write. Unused on Electron */
-PIN 3   = M_CS_E_RW ;   /* Master: active-high select. Electron: Read/!Write */
+PIN 2   = RWm ;         /* BBC Master Read/!Write. Unused on Electron */
+PIN 3   = RWe_CSm ;     /* Master: active-high select. Electron: Read/!Write */
 PIN 4   = !ROMOE ;      /* Cartridge select line */
 PIN 5   = ROMQA ;       /* ROM low/high select */
 PIN 6   = !A15H ;       /* Bank-select switch input for high ROM */
@@ -41,7 +41,7 @@ PIN 19  = A16 ;         /* Flash address line A16 */
 A15     = !ROMQA & A15L             # ROMQA & A15H ;
 A16     = !ROMQA & A16L             # ROMQA & A16H ;
 
-/*          Master                          Electron                    */
-CS      =   MADET & M_CS_E_RW & Phi2    # !MADET & ROMOE & Phi2 ;
-OE      =   MADET & ROMOE & M_RW        # !MADET & ROMOE & M_CS_E_RW ;
-PGM     =   MADET & !M_RW               # !MADET & !M_CS_E_RW ;
+/*          Master                    Electron                          */
+CS      =   MADET & RWe_CSm & Phi2  # !MADET & ROMOE & Phi2 ;
+OE      =   MADET & ROMOE & RWm     # !MADET & ROMOE & RWe_CSm ;
+PGM     =   MADET & !RWm            # !MADET & !RWe_CSm ;
