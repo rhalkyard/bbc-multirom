@@ -2028,7 +2028,7 @@
     (property "Value" "Conn_02x22_Row_Letter_First" (at 33.02 16.4846 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "BBC Master Cartridge:BBC Master Cartridge" (at 31.75 45.085 0)
+    (property "Footprint" "BBC Master / Acorn Electron Cartridge:bbc-master-acorn-electron-cartridge" (at 31.75 45.085 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 31.75 45.085 0)

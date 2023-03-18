@@ -1,3 +1,4 @@
 (fp_lib_table
-  (lib (name "BBC Master Cartridge")(type KiCad)(uri "${KIPRJMOD}/BBC Master Cartridge.pretty")(options "")(descr ""))
+  (version 7)
+  (lib (name "BBC Master / Acorn Electron Cartridge")(type "KiCad")(uri "${KIPRJMOD}/bbc-master-acorn-electron-cartridge.pretty")(options "")(descr ""))
 )
