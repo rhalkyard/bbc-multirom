@@ -21,10 +21,7 @@ GUARD &2000 \ probably not really necessary here, but might as well have a sanit
 
     JMP print_roms
 
-DISABLE_ERASE_CHIP=TRUE
-DISABLE_ERASE_ROM=TRUE
-DISABLE_ERASE_SECTOR=TRUE
-DISABLE_WRITE_BYTE=TRUE
+ENABLE_PRINT_ROMS=TRUE
 INCLUDE "flashio.6502"
 
 .end

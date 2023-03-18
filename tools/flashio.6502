@@ -6,18 +6,21 @@
 \ romsav (1 byte)   - saved ROM number
 \ romptr (2 bytes)  - pointer into ROM
 
-\ Set to true before including to disable assembly of unused routines
-DISABLE_ERASE_CHIP =? FALSE
-DISABLE_ERASE_ROM =? FALSE
-DISABLE_ERASE_SECTOR =? FALSE
-DISABLE_PRINT_ROMS =? FALSE
-DISABLE_PRINT_ROMSTR =? FALSE
-DISABLE_READ_BYTE =? FALSE
-DISABLE_READ_ID =? FALSE
-DISABLE_ROM_VALID =? FALSE
-DISABLE_WRITE_BYTE =? FALSE
+\ Before including this file, set these 'ENABLE_<routinename>' variables to TRUE
+\ for routines that you wish to call.
+ENABLE_ERASE_CHIP =? FALSE
+ENABLE_ERASE_ROM =? FALSE
+ENABLE_ERASE_SECTOR =? ENABLE_ERASE_ROM
+ENABLE_PRINT_ROMS =? FALSE
+ENABLE_PRINT_ROMSTR =? ENABLE_PRINT_ROMS
+ENABLE_READ_BYTE =? ENABLE_PRINT_ROMSTR
+ENABLE_READ_ID =? ENABLE_PRINT_ROMS
+ENABLE_ROM_VALID =? ENABLE_PRINT_ROMS
+ENABLE_WRITE_BYTE =? FALSE
 
-IF DISABLE_READ_ID = FALSE
+DEBUG_ID = FALSE
+
+IF ENABLE_READ_ID
 \ Read ROM ID bytes into A and Y
 \ Arguments:    X - ROM to select
 \ Returns:      A - manufacturer ID
@@ -53,8 +56,10 @@ IF DISABLE_READ_ID = FALSE
     BNE got_id
 \... if so, we're almost certainly not looking at a valid flash IC. Return an
 \ invalid ID of 00,00
+IF DEBUG_ID = FALSE
     LDA #$00
     LDY #$00
+ENDIF
 
 .got_id
     JMP epilogue
@@ -70,7 +75,7 @@ IF DISABLE_READ_ID = FALSE
 }
 ENDIF
 
-IF DISABLE_ERASE_SECTOR = FALSE
+IF ENABLE_ERASE_SECTOR
 \ Erase a single 4K sector, pointed to by romptr
 \ Arguments:    X - ROM to select
 \               romptr (zero page) - address of sector to erase
@@ -91,7 +96,7 @@ IF DISABLE_ERASE_SECTOR = FALSE
 }
 ENDIF
 
-IF DISABLE_ERASE_ROM = FALSE
+IF ENABLE_ERASE_ROM
 \ Erase an entire ROM
 \ Arguments:    X - ROM to select
 \ Destroys:     A, Y, romptr
@@ -112,7 +117,7 @@ IF DISABLE_ERASE_ROM = FALSE
 }
 ENDIF
 
-IF DISABLE_ERASE_CHIP = FALSE    
+IF ENABLE_ERASE_CHIP    
 \ Erase the whole chip
 \ Arguments:    X - ROM to select
 \ Destroys:     A, X
@@ -127,7 +132,7 @@ IF DISABLE_ERASE_CHIP = FALSE
 }
 ENDIF
 
-IF DISABLE_WRITE_BYTE = FALSE
+IF ENABLE_WRITE_BYTE
 \ Write a byte to (romptr),y
 \ Arguments:    A - byte to write
 \               X - ROM to select
@@ -150,7 +155,7 @@ IF DISABLE_WRITE_BYTE = FALSE
 }
 ENDIF
 
-IF DISABLE_ERASE_CHIP=FALSE OR DISABLE_ERASE_ROM=FALSE OR DISABLE_ERASE_SECTOR=FALSE OR DISABLE_WRITE_BYTE=FALSE
+IF ENABLE_ERASE_CHIP OR ENABLE_ERASE_ROM OR ENABLE_ERASE_SECTOR OR ENABLE_WRITE_BYTE
 \ SST39SF010 indicates an operation in progress by toggling bit 6 on every
 \ subsequent read. Repeatedly read from ROM until we get the same value twice.
 \ Preserves:    X, Y
@@ -165,7 +170,7 @@ IF DISABLE_ERASE_CHIP=FALSE OR DISABLE_ERASE_ROM=FALSE OR DISABLE_ERASE_SECTOR=F
 }
 ENDIF
 
-IF DISABLE_READ_BYTE = FALSE
+IF ENABLE_READ_BYTE
 \ Read a byte from (romptr),y
 \ Arguments:    X - ROM to select
 \               (romptr), Y - address to write
@@ -183,7 +188,7 @@ IF DISABLE_READ_BYTE = FALSE
 }
 ENDIF
 
-IF DISABLE_PRINT_ROMS = FALSE
+IF ENABLE_PRINT_ROMS
 \ Print list of ROMs, formatted as a table
 \ Destroys:     A, X, Y, romptr
 .print_roms
@@ -199,6 +204,17 @@ IF DISABLE_PRINT_ROMS = FALSE
 
     JSR print_space
     JSR read_id             \ Read ROM ID bytes
+    
+IF DEBUG_ID
+    PHA
+    JSR print_byte
+    JSR print_space
+    TYA
+    JSR print_byte
+    JSR print_space
+    PLA
+ENDIF
+
     CMP #0:BNE checkflash   \ mfg ID nonzero, check if we're a flash chip
     CPY #1:BEQ ram          \ mfg ID 0, product ID 1 = writeable memory
     PLA:TAX:PHA
@@ -206,12 +222,13 @@ IF DISABLE_PRINT_ROMS = FALSE
     LDA #'R':JMP print_type
 .checkflash
     CMP #&BF:BNE unknown
-    CMP #&B5:BNE unknown    
+    CPY #&B5:BNE unknown    
     LDA #'F':JMP print_type \ We only consider SST39SF010 (ID byte &BF &BE) to be Flash
 .ram
     LDA #'W':JMP print_type
 .unknown
-    LDA #'?':JMP print_type
+    JSR rom_valid:BNE empty \ Check for a rom signature; a bogus ID could be 
+    LDA #'?':JMP print_type \ just noise from an undriven bus
 .empty
     LDA #'-'
 .print_type
@@ -249,12 +266,10 @@ IF DISABLE_PRINT_ROMS = FALSE
     LDA #' ':JMP osasci
 
 \ Print a byte as hex
-\ Taken from WOZMON source
 \ Arguments:    A - byte to print
 \ Preserves:    X, Y
 \ Destroys:     A
 .print_byte
-
     PHA:LSR A:LSR A:LSR A:LSR A:JSR print_hex
     PLA
 .print_hex
@@ -269,7 +284,7 @@ IF DISABLE_PRINT_ROMS = FALSE
 }
 ENDIF
 
-IF DISABLE_PRINT_ROMSTR = FALSE
+IF ENABLE_PRINT_ROMSTR
 \ Print a string from ROM, stopping at the first control character
 \ Arguments:    (romptr), Y - start address of string
 \               X - ROM number
@@ -290,7 +305,7 @@ IF DISABLE_PRINT_ROMSTR = FALSE
 }
 ENDIF
 
-IF DISABLE_ROM_VALID = FALSE
+IF ENABLE_ROM_VALID
 \ Check for a valid ROM (existence of copyright string)
 \ Arguments:    X - ROM number
 \               romptr must be &8000
