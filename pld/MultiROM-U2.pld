@@ -2,7 +2,7 @@ GAL16V8 ; Device (ATF16V8 is compatible)
 MRU2    ; Identifier
 
 ; Pin definitions
-Phi2    RWm     RWeCSm  /ROMOE  /ROMQA  /A15H   /A16H   /A15L   /A16L   GND
+Phi2    RWm     RWeCSm  /ROMOE  ROMQA   /A15H   /A16H   /A15L   /A16L   GND
 /MADET  /CS     /OE     NC      NC      NC      /PGM    A15     A16     VCC
 
 ; Address line selection
