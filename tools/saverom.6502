@@ -1,6 +1,6 @@
 \ SaveROM: A simple tool to save Sideways ROM contents to a file.
 
-INCLUDE "common.6502"
+INCLUDE "tools/common.6502"
 
 ORG &1D00
 GUARD &6000
@@ -111,7 +111,7 @@ GUARD &6000
 
 ENABLE_PRINT_ROMS=TRUE
 ENABLE_READ_BYTE=TRUE
-INCLUDE "flashio.6502"
+INCLUDE "tools/flashio.6502"
 
 .strings
 .str_header

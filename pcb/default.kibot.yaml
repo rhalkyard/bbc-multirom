@@ -7,13 +7,13 @@ import:
 - file: JLCPCB
 - file: PCBWay
 
-# global:
-#   restore_project: true
+global:
+  restore_project: true
 
 preflight:
   set_text_variables:
     - name: VERSION
-      command: "cat version.txt || echo '(no version)'"
+      command: "echo ${VERSION:-(no version)}"
 
 outputs:
 - name: bom_html
@@ -54,16 +54,16 @@ outputs:
     description: Front copper
   - layer: B.Cu
     suffix: B_Cu
-    description: Bottom copper
+    description: Back copper
   - layer: B.Silkscreen
     suffix: B_Silkscreen
-    description: Bottom silkscreen (artwork)
+    description: Back silkscreen (artwork)
   - layer: F.Silkscreen
     suffix: F_Silkscreen
     description: Front silkscreen (artwork)
   - layer: B.Mask
     suffix: B_Mask
-    description: Bottom soldermask (negative)
+    description: Back soldermask (negative)
   - layer: F.Mask
     suffix: F_Mask
     description: Front soldermask (negative)
@@ -75,13 +75,13 @@ outputs:
     description: Board shape
   - layer: B.Courtyard
     suffix: B_Courtyard
-    description: Bottom courtyard area
+    description: Back courtyard area
   - layer: F.Courtyard
     suffix: F_Courtyard
     description: Front courtyard area
   - layer: B.Fab
     suffix: B_Fab
-    description: Bottom documentation
+    description: Back documentation
   - layer: F.Fab
     suffix: F_Fab
     description: Front documentation
@@ -98,16 +98,16 @@ outputs:
     description: Front copper
   - layer: B.Cu
     suffix: B_Cu
-    description: Bottom copper
+    description: Back copper
   - layer: B.Silkscreen
     suffix: B_Silkscreen
-    description: Bottom silkscreen (artwork)
+    description: Back silkscreen (artwork)
   - layer: F.Silkscreen
     suffix: F_Silkscreen
     description: Front silkscreen (artwork)
   - layer: B.Mask
     suffix: B_Mask
-    description: Bottom soldermask (negative)
+    description: Back soldermask (negative)
   - layer: F.Mask
     suffix: F_Mask
     description: Front soldermask (negative)
@@ -260,13 +260,13 @@ outputs:
       - layer: Edge.Cuts
       - layer: User.Drawings
       mirror: true
-      sheet: Bottom copper
+      sheet: Back copper
     - layers:
       - layer: B.Courtyard
       - layer: Edge.Cuts
       - layer: User.Drawings
       mirror: true
-      sheet: Bottom courtyard area
+      sheet: Back courtyard area
     - layers:
       - layer: F.Courtyard
       - layer: Edge.Cuts
@@ -277,7 +277,7 @@ outputs:
       - layer: Edge.Cuts
       - layer: User.Drawings
       mirror: true
-      sheet: Bottom documentation
+      sheet: Back documentation
     - layers:
       - layer: F.Fab
       - layer: Edge.Cuts
@@ -305,16 +305,16 @@ outputs:
     ray_tracing: true
     rotate_x: 3
     rotate_z: -2
-- name: basic_render_3d_bottom
-  comment: 3D view from bottom
+- name: basic_render_3d_back
+  comment: 3D view from back
   type: render_3d
   dir: renders
   options:
     ray_tracing: true
     orthographic: true
     view: bottom
-- name: basic_render_3d_bottom30deg
-  comment: 3D view from 30 degrees
+- name: basic_render_3d_back30deg
+  comment: 3D view from back, 30 degrees
   type: render_3d
   dir: renders
   output_id: 30deg
@@ -323,21 +323,6 @@ outputs:
     view: bottom
     rotate_x: 3
     rotate_z: 2
-
-# - name: report_simple
-#   comment: Simple design report
-#   type: report
-#   output_id: _simple
-#   options:
-#     template: simple_ASCII
-#     do_convert: true
-
-# - name: report_full
-#   comment: Full design report
-#   type: report
-#   options:
-#     template: full_SVG
-#     do_convert: true
 
 - name: basic_step
   comment: 3D model in STEP format

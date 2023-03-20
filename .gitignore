@@ -54,7 +54,6 @@ fp-info-cache
 
 # Tools build output
 *.ssd
-tools/version.txt
 tools/README_disc.txt
 tools/cartprg
 tools/listrom
@@ -64,6 +63,6 @@ tools/saverom
 pcb/build/
 pcb/Makefile.kibot
 pcb/kibot_error.log
-pcb/version.txt
 
-release/
+dist/
+version.txt

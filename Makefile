@@ -1,20 +1,30 @@
-include vars.mk
+NAME = MultiROM
 
-all: pcb/all pld/all tools/all
+MODULES = pcb pld tools
 
-clean: pcb/clean pld/clean tools/clean
-	rm -rf release/
+CLEAN=dist/ version.txt
 
-.PHONY: all clean release
+TAG_COMMIT := $(shell git rev-list --abbrev-commit --tags --max-count=1)
+TAG := $(shell git describe --abbrev=0 --tags ${TAG_COMMIT} 2>/dev/null || true)
+COMMIT := $(shell git rev-parse --short HEAD)
+DATE := $(shell git log -1 --format=%cd --date=format:"%Y%m%d")
+VERSION := $(TAG:v%=%)
+ifneq ($(COMMIT), $(TAG_COMMIT))
+    VERSION := $(VERSION)+$(COMMIT)-$(DATE)
+endif
+ifeq ($(VERSION),)
+    VERSION := $(COMMIT)-$(DATE)
+endif
+ifneq ($(shell git status --porcelain),)
+    VERSION := $(VERSION)-dirty
+endif
 
-pcb/%:
-	$(MAKE) -C pcb $(@:pcb/%=%)
+include $(patsubst %,%/module.mk,$(MODULES))
 
-pld/%:
-	$(MAKE) -C pld $(@:pld/%=%)
+clean:
+	rm -rf $(CLEAN)
 
-tools/%:
-	$(MAKE) -C tools $(@:tools/%=%)
+.PHONY: all clean dist dist-zip version.txt
 
 RELEASE_FILES = \
 	pcb/build/$(NAME)-bom.html \
@@ -25,7 +35,16 @@ RELEASE_FILES = \
 	pld/$(NAME)-U2.jed \
 	tools/$(NAME)-tools.ssd
 
-release: $(RELEASE_FILES)
-	rm -rf release/
-	mkdir release/
-	cp $(foreach file, $(RELEASE_FILES), $(file)) release/
+version.txt:
+	$(shell echo $(VERSION) > version.txt)
+
+dist: dist/$(NAME)-$(VERSION)
+dist-zip: dist/$(NAME)-$(VERSION).zip
+
+dist/$(NAME)-$(VERSION): $(RELEASE_FILES)
+	rm -rf dist/$(NAME)-$(VERSION)
+	mkdir -p dist/$(NAME)-$(VERSION)
+	cp $(foreach file, $(RELEASE_FILES), $(file)) dist/$(NAME)-$(VERSION)
+
+dist/$(NAME)-$(VERSION).zip: dist/$(NAME)-$(VERSION)
+	zip -r $@ $<

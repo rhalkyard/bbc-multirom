@@ -7,7 +7,7 @@ EQUS "*TYPE README", &0D
 
 SAVE "!BOOT", begin, end, &FFFFFF
 
-PUTTEXT "README.txt", "README", &3FFFF
-PUTFILE "cartprg", &1D00, &1D00
-PUTFILE "saverom", &1D00, &1D00
-PUTFILE "listrom", &1D00, &1D00
+PUTTEXT "tools/README.txt", "README", &3FFFF
+PUTFILE "tools/cartprg", "cartprg", &1D00, &1D00
+PUTFILE "tools/saverom", "saverom", &1D00, &1D00
+PUTFILE "tools/listrom", "listrom", &1D00, &1D00
