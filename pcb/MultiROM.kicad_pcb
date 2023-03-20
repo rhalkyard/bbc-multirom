@@ -1065,7 +1065,7 @@
   (gr_text "MultiROM" (at 30.48 57.785 90) (layer "F.SilkS") (tstamp 1e10c5c7-1fe9-4d62-8237-eec8fede6084)
     (effects (font (size 3 3) (thickness 0.6) bold italic) (justify left bottom))
   )
-  (gr_text "github.com/rhalkyard/bbc-multirom\n${VERSION}" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
+  (gr_text "github.com/rhalkyard/bbc-multirom\nIssue 1" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
     (effects (font (size 1 1) (thickness 0.125)) (justify left top))
   )
   (gr_text "This side to front" (at 110.49 28.575) (layer "F.SilkS") (tstamp 6b90ec4d-9008-4361-918b-c87f78bedacf)
