@@ -62,7 +62,7 @@ tools/saverom
 # Kibot stuff
 pcb/build/
 pcb/Makefile.kibot
-pcb/kibot_error.log
+kibot_error.log
 
 dist/
 version.txt
