@@ -7,8 +7,8 @@
   (paper "USLetter")
   (title_block
     (title "Cartridge for BBC Master & Acorn Electron")
-    (date "2023-03-18")
-    (rev "${VERSION}")
+    (date "${PCB_DATE}")
+    (rev "${REVISION}")
   )
 
   (layers
@@ -88,7 +88,9 @@
   )
 
   (property "PCBFab_placeholder" "")
-  (property "VERSION" "")
+  (property "PCB_DATE" "")
+  (property "REVISION" "")
+  (property "SCH_DATE" "")
 
   (net 0 "")
   (net 1 "GND")

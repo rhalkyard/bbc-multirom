@@ -12,8 +12,12 @@ global:
 
 preflight:
   set_text_variables:
-    - name: VERSION
-      command: "echo ${VERSION:-(no version)}"
+    - name: REVISION
+      command: "echo ${VERSION_SHORT:-(none)}"
+    - name: PCB_DATE
+      command: date -d @`git log -1 --format='%at' -- "$KIBOT_PCB_NAME"` +%Y-%m-%d_%H-%M-%S
+    - name: SCH_DATE
+      command: date -d @`git log -1 --format='%at' -- "$KIBOT_SCH_NAME"` +%Y-%m-%d_%H-%M-%S
 
 outputs:
 - name: bom_html

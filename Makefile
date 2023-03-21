@@ -10,13 +10,16 @@ COMMIT := $(shell git rev-parse --short HEAD)
 DATE := $(shell git log -1 --format=%cd --date=format:"%Y%m%d")
 VERSION := $(TAG:v%=%)
 ifneq ($(COMMIT), $(TAG_COMMIT))
-    VERSION := $(VERSION)+$(COMMIT)-$(DATE)
+    VERSION_SHORT := $(VERSION)+$(shell git log --oneline $(TAG_COMMIT)..$(COMMIT) | wc -l)
+    VERSION := $(VERSION_SHORT)-$(COMMIT)-$(DATE)
 endif
 ifeq ($(VERSION),)
     VERSION := $(COMMIT)-$(DATE)
+    VERSION_SHORT := $(COMMIT)-$(DATE)
 endif
 ifneq ($(shell git status --porcelain),)
     VERSION := $(VERSION)-dirty
+    VERSION_SHORT := $(VERSION_SHORT)*
 endif
 
 include $(patsubst %,%/module.mk,$(MODULES))

@@ -526,6 +526,8 @@
   ],
   "text_variables": {
     "PCBFab_placeholder": "",
-    "VERSION": ""
+    "PCB_DATE": "",
+    "REVISION": "",
+    "SCH_DATE": ""
   }
 }
