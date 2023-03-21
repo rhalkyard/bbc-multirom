@@ -2242,7 +2242,7 @@
     )
   )
 
-  (symbol (lib_id "Switch:SW_DIP_x04") (at 141.605 120.65 180) (unit 1)
+  (symbol (lib_id "Switch:SW_DIP_x04") (at 141.605 120.65 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063f6456f)
     (property "Reference" "SW1" (at 141.605 111.3282 0)
@@ -2251,7 +2251,7 @@
     (property "Value" "SW_DIP_x04" (at 141.605 113.6396 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Button_Switch_THT:SW_DIP_SPSTx04_Slide_9.78x12.34mm_W7.62mm_P2.54mm" (at 141.605 120.65 0)
+    (property "Footprint" "Button_Switch_THT:SW_DIP_SPSTx04_Piano_10.8x11.72mm_W7.62mm_P2.54mm" (at 141.605 120.65 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 141.605 120.65 0)
