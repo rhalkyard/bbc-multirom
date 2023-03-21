@@ -6,14 +6,6 @@ Rather than use the 27x and 28x series (E)EPROMS that were used Back In The Day,
 
 The schematic and PCB layout were produced using [KiCad 7.0](https://www.kicad.org/).
 
-## What's in this repository
-
-- [`pcb/`](pcb/) - schematics and circuit board layout
-
-- [`pld/`](pld/) - programmable logic source
-
-- [`tools/`](tools/) - tools for programming the MultiROM cartridge
-
 ## How to build MultiROM
 
 ### Bill of Materials
@@ -32,11 +24,13 @@ Reference   | Part
 
 ### PCB
 
-Any PCB fabricator service such as PCBWay, OSHPark or JLCPCB should be able to fabricate the board. Some shops will accept the `.kicad_pcb` file directly, but most will require Gerber and drill files. These can be exported from Kicad using the File -> Fabrication Outputs menu options. Your particular fabricator's requirements may vary, but for example, see [JLCPCB's Kicad export instructions](https://support.jlcpcb.com/article/194-how-to-generate-gerber-and-drill-files-in-kicad-6).
+Any PCB fabricator service such as PCBWay, OSHPark or JLCPCB should be able to fabricate the board. Some shops will accept the `.kicad_pcb` file directly, but most will require Gerber and drill files. These can be exported from Kicad using the File -> Fabrication Outputs menu options.
 
 Ideally, the edge connector should have a chamfered board edge and hard gold-plated contacts, to avoid damaging the PCB socket and to ensure a good connection. These are usually extra-cost options that have to be requested when placing the order.
 
 When assembling components onto the PCB, pay attention to which side they are on! Integrated Circuits `U1` and `U2` go on the *back* side of the PCB, with their orientation notches facing towards the edge connector.
+
+This project uses [KiBot](https://github.com/INTI-CMNB/KiBot) to automate output in various formats from KiCad; release archives contain manufacturing files for various popular PCB fabricators.
 
 ### GAL
 

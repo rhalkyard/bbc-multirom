@@ -29,14 +29,27 @@ clean:
 
 .PHONY: all clean dist dist-zip version.txt
 
-RELEASE_FILES = \
+RELEASE_FILE_DEPS = \
 	pcb/build/$(NAME)-bom.html \
 	pcb/build/$(NAME)-bom.csv \
 	pcb/build/$(NAME)-ibom.html \
 	pcb/build/$(NAME)-pcb.pdf \
 	pcb/build/$(NAME)-schematic.pdf \
+	pcb/build/Manufacturers/$(NAME)-Elecrow.zip \
+	pcb/build/Manufacturers/$(NAME)-FusionPCB.zip \
+	pcb/build/Manufacturers/$(NAME)-JLCPCB.zip \
+	pcb/build/Manufacturers/$(NAME)-PCBWay.zip \
 	pld/$(NAME)-U2.jed \
-	tools/$(NAME)-tools.ssd
+	tools/$(NAME)-tools.ssd \
+	README.md
+
+RELEASE_PHONY_DEPS = pcb/all
+
+RELEASE_EXTRA_FILES = pcb/build/Gerbers_and_Drill
+
+RELEASE_DEPS = $(RELEASE_FILE_DEPS) $(RELEASE_PHONY_DEPS)
+
+RELEASE_FILES = $(RELEASE_FILE_DEPS) $(RELEASE_EXTRA_FILES)
 
 version.txt:
 	$(shell echo $(VERSION) > version.txt)
@@ -44,10 +57,10 @@ version.txt:
 dist: dist/$(NAME)-$(VERSION)
 dist-zip: dist/$(NAME)-$(VERSION).zip
 
-dist/$(NAME)-$(VERSION): $(RELEASE_FILES)
+dist/$(NAME)-$(VERSION): $(RELEASE_DEPS)
 	rm -rf dist/$(NAME)-$(VERSION)
 	mkdir -p dist/$(NAME)-$(VERSION)
-	cp $(foreach file, $(RELEASE_FILES), $(file)) dist/$(NAME)-$(VERSION)
+	cp -r $(foreach file, $(RELEASE_FILES), $(file)) dist/$(NAME)-$(VERSION)
 
 dist/$(NAME)-$(VERSION).zip: dist/$(NAME)-$(VERSION)
 	zip -r $@ $<
