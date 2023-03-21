@@ -293,13 +293,14 @@ outputs:
   comment: Schematic in PDF format
   type: pdf_sch_print
 
-- name: basic_render_3d_top
-  comment: 3D view from top
-  type: render_3d
-  dir: renders
-  options:
-    ray_tracing: true
-    orthographic: true
+# - name: basic_render_3d_top
+#   comment: 3D view from top
+#   type: render_3d
+#   dir: renders
+#   options:
+#     ray_tracing: true
+#     orthographic: true
+#     zoom: 1
 - name: basic_render_3d_30deg
   comment: 3D view from 30 degrees
   type: render_3d
@@ -309,14 +310,16 @@ outputs:
     ray_tracing: true
     rotate_x: 3
     rotate_z: -2
-- name: basic_render_3d_back
-  comment: 3D view from back
-  type: render_3d
-  dir: renders
-  options:
-    ray_tracing: true
-    orthographic: true
-    view: bottom
+    zoom: 5
+# - name: basic_render_3d_back
+#   comment: 3D view from back
+#   type: render_3d
+#   dir: renders
+#   options:
+#     ray_tracing: true
+#     orthographic: true
+#     view: bottom
+#     zoom: 1
 - name: basic_render_3d_back30deg
   comment: 3D view from back, 30 degrees
   type: render_3d
@@ -325,6 +328,7 @@ outputs:
   options:
     ray_tracing: true
     view: bottom
+    zoom: 5
     rotate_x: 3
     rotate_z: 2
 

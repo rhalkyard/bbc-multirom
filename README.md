@@ -6,6 +6,9 @@ Rather than use the 27x and 28x series (E)EPROMS that were used Back In The Day,
 
 The schematic and PCB layout were produced using [KiCad 7.0](https://www.kicad.org/).
 
+![Three-quarter view of front side of PCB](images/MultiROM-3D_top30deg.png)
+![Three-quarter view of rear side of PCB](images/MultiROM-3D_bottom30deg.png)
+
 ## How to build MultiROM
 
 ### Bill of Materials

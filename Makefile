@@ -27,7 +27,7 @@ include $(patsubst %,%/module.mk,$(MODULES))
 clean:
 	rm -rf $(CLEAN)
 
-.PHONY: all clean dist dist-zip version.txt
+.PHONY: all clean dist dist-zip version.txt images
 
 RELEASE_FILE_DEPS = \
 	pcb/build/$(NAME)-bom.html \
@@ -54,6 +54,11 @@ RELEASE_FILES = $(RELEASE_FILE_DEPS) $(RELEASE_EXTRA_FILES)
 version.txt:
 	$(shell echo $(VERSION) > version.txt)
 
+images: images/MultiROM-3D_bottom30deg.png images/MultiROM-3D_top30deg.png
+
+images/%: pcb/build/renders/%
+	cp $< $@
+
 dist: dist/$(NAME)-$(VERSION)
 dist-zip: dist/$(NAME)-$(VERSION).zip
 
@@ -64,3 +69,4 @@ dist/$(NAME)-$(VERSION): $(RELEASE_DEPS)
 
 dist/$(NAME)-$(VERSION).zip: dist/$(NAME)-$(VERSION)
 	zip -r $@ $<
+
