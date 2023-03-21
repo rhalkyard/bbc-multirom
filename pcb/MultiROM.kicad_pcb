@@ -885,7 +885,7 @@
   (gr_text "High" (at 58.928 28.448) (layer "F.SilkS") (tstamp 2ada8e43-a8d8-4df9-a551-b227dc2ab3c1)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text "github.com/rhalkyard/bbc-multirom\n" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
+  (gr_text "github.com/rhalkyard/bbc-multirom\nIssue 1" (at 36.195 57.785 90) (layer "F.SilkS") (tstamp 37401a9e-1eb9-477e-9954-17a12a8876b9)
     (effects (font (size 1 1) (thickness 0.125)) (justify left top))
   )
   (gr_text "Bank Select" (at 50.8 32.512) (layer "F.SilkS") (tstamp 43250910-2845-46d8-b95d-6a45ce7740a4)
